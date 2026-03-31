@@ -1,5 +1,5 @@
 <template>
-    <Head title="Master Produk - POSCok" />
+    <Head title="Master Produk" />
 
     <AuthenticatedLayout>
 

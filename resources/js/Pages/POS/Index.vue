@@ -1,5 +1,5 @@
 <template>
-    <Head title="Point of Sale - POSCok" />
+    <Head title="Point of Sale" />
 
     <AuthenticatedLayout>
         <div class="row g-5">

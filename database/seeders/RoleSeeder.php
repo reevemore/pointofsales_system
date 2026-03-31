@@ -16,7 +16,7 @@ class RoleSeeder extends Seeder
         $kasir  = Role::firstOrCreate(['name' => 'kasir']);
 
         // User rudy (yang sudah ada) jadi admin
-        $user = User::where('email', 'rudy@example.com')->first();
+        $user = User::where('email', 'admin@admin.com')->first();
         if ($user) {
             $user->assignRole('admin');
         }

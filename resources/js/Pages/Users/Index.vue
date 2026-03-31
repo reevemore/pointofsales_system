@@ -1,5 +1,5 @@
 <template>
-    <Head title="Manajemen User - POSCok" />
+    <Head title="Manajemen User" />
 
     <AuthenticatedLayout>
         <div class="container-xxl">

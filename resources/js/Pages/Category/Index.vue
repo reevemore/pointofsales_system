@@ -1,5 +1,5 @@
 <template>
-    <Head title="Kategori Produk - POSCok" />
+    <Head title="Kategori Produk" />
 
     <AuthenticatedLayout>
         <div class="container-xxl">

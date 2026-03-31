@@ -1,5 +1,5 @@
 <template>
-    <Head title="Dashboard - POSCok" />
+    <Head title="Dashboard" />
 
     <AuthenticatedLayout>
         <div class="container-xxl">

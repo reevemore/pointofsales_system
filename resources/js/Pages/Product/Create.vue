@@ -1,6 +1,8 @@
 <template>
     <AuthenticatedLayout>
 
+        <Head title="Tambah Produk" />
+
         <div class="d-flex flex-wrap flex-stack mb-6">
             <h3 class="fw-bolder my-2">Tambah Produk</h3>
             <Link :href="route('products.index')" class="btn btn-light">
@@ -19,7 +21,7 @@
                             <select v-model="form.category_id"
                                 class="form-select form-select-solid"
                                 :class="{ 'is-invalid': form.errors.category_id }">
-                                <option value="">-- Pilih Kategori --</option>
+                                <option value="">Pilih Kategori mu Bos😂</option>
                                 <option v-for="cat in categories" :key="cat.id" :value="cat.id">
                                     {{ cat.nama }}
                                 </option>
@@ -132,7 +134,7 @@
 </template>
 
 <script setup>
-import { Link, useForm } from '@inertiajs/vue3'
+import { Head, Link, useForm } from '@inertiajs/vue3'
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue'
 
 defineProps({ categories: Array })

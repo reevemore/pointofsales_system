@@ -1,5 +1,5 @@
 <template>
-    <Head title="Laporan Transaksi - POSCok" />
+    <Head title="Laporan Transaksi" />
 
     <AuthenticatedLayout>
         <div class="laporan-container">

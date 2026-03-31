@@ -1,5 +1,5 @@
 <template>
-    <Head title="Riwayat Transaksi - POSCok" />
+    <Head title="Riwayat Transaksi" />
 
     <AuthenticatedLayout>
 

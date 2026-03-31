@@ -1,6 +1,8 @@
 <template>
     <AuthenticatedLayout>
 
+        <Head title="Tambah Member" />
+
         <div class="d-flex flex-wrap flex-stack mb-6">
             <h3 class="fw-bolder my-2">Tambah Member</h3>
             <Link :href="route('members.index')" class="btn btn-light">
@@ -55,11 +57,20 @@
 
                     <div class="row mb-6">
                         <label class="col-lg-3 col-form-label required fw-bold fs-6">Status</label>
-                        <div class="col-lg-9">
-                            <select v-model="form.status" class="form-select form-select-solid">
-                                <option value="aktif">Aktif</option>
-                                <option value="nonaktif">Non-aktif</option>
-                            </select>
+                        <div class="col-lg-9 d-flex align-items-center gap-3">
+                            <div class="form-check form-switch form-check-custom form-check-solid">
+                                <input
+                                    class="form-check-input"
+                                    type="checkbox"
+                                    :checked="form.status === 'aktif'"
+                                    @change="form.status = $event.target.checked ? 'aktif' : 'nonaktif'"
+                                    style="width: 45px; height: 24px; cursor: pointer;"
+                                />
+                            </div>
+                            <span :class="['status-badge', form.status === 'aktif' ? 'status-aktif' : 'status-nonaktif']">
+                                <span class="status-dot"></span>
+                                {{ form.status === 'aktif' ? 'Aktif' : 'Nonaktif' }}
+                            </span>
                         </div>
                     </div>
 
@@ -81,7 +92,7 @@
 </template>
 
 <script setup>
-import { Link, useForm } from '@inertiajs/vue3'
+import { Head, Link, useForm } from '@inertiajs/vue3'
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue'
 
 const form = useForm({

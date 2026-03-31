@@ -1,5 +1,5 @@
 <template>
-    <Head title="Manajemen Stok - POSCok" />
+    <Head title="Manajemen Stok" />
 
     <AuthenticatedLayout>
         <div class="container-xxl">

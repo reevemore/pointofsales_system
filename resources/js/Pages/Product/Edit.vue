@@ -1,6 +1,8 @@
 <template>
     <AuthenticatedLayout>
 
+        <Head title="Edit Produk" />
+
         <div class="d-flex flex-wrap flex-stack mb-6">
             <h3 class="fw-bolder my-2">Edit Produk</h3>
             <Link :href="route('products.index')" class="btn btn-light">
@@ -126,7 +128,7 @@
 </template>
 
 <script setup>
-import { Link, useForm } from '@inertiajs/vue3'
+import { Head, Link, useForm } from '@inertiajs/vue3'
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue'
 
 const props = defineProps({ product: Object, categories: Array })

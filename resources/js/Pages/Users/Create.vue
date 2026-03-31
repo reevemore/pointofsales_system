@@ -1,5 +1,5 @@
 <template>
-    <Head title="Tambah User - POSCok" />
+    <Head title="Tambah User" />
 
     <AuthenticatedLayout>
         <div class="container-xxl">

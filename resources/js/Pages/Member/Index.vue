@@ -1,5 +1,5 @@
 <template>
-    <Head title="Manajemen Member - POSCok" />
+    <Head title="Manajemen Member" />
 
     <AuthenticatedLayout>
 
