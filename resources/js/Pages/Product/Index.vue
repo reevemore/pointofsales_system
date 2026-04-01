@@ -39,6 +39,7 @@
                         <thead>
                             <tr class="fw-bold text-muted">
                                 <th>#</th>
+                                <th>Foto</th>
                                 <th>Kode</th>
                                 <th>Nama Produk</th>
                                 <th>Kategori</th>
@@ -50,12 +51,26 @@
                         </thead>
                         <tbody>
                             <tr v-if="filteredProducts.length === 0">
-                                <td colspan="8" class="text-center text-muted py-10">
+                                <td colspan="9" class="text-center text-muted py-10">
                                     Belum ada data produk
                                 </td>
                             </tr>
                             <tr v-for="(product, i) in filteredProducts" :key="product.id">
                                 <td>{{ i + 1 }}</td>
+                                <td>
+                                    <div class="symbol symbol-50px">
+                                        <img v-if="product.foto"
+                                            :src="'/storage/' + product.foto"
+                                            :alt="product.nama"
+                                            class="object-fit-cover rounded"
+                                            style="width:50px;height:50px;" />
+                                        <div v-else
+                                            class="symbol-label fs-4 rounded"
+                                            style="width:50px;height:50px;background:#f1f5ff;display:flex;align-items:center;justify-content:center;">
+                                            📦
+                                        </div>
+                                    </div>
+                                </td>
                                 <td>
                                     <span class="badge badge-light-info fw-bold">
                                         {{ product.kode_produk }}

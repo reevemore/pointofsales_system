@@ -14,6 +14,7 @@ class Product extends Model
         'kode_produk',
         'nama',
         'deskripsi',
+        'foto',
         'harga_beli',
         'harga_jual',
         'stok',
@@ -37,8 +38,7 @@ class Product extends Model
     }
 
     public function stockMutations()
-   {
-    return $this->hasMany(StockMutation::class);
-   }
-
+    {
+        return $this->hasMany(StockMutation::class);
+    }
 }

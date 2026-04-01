@@ -22,12 +22,27 @@
                             <div v-for="product in filteredProducts" :key="product.id" class="col-6 col-md-4">
                                 <div class="card card-bordered card-hover cursor-pointer h-100"
                                     @click="addToCart(product)">
-                                    <div class="card-body p-4 text-center">
-                                        <div class="fs-6 fw-bold text-gray-800 mb-1">{{ product.nama }}</div>
-                                        <div class="text-muted fs-8 mb-2">{{ product.category?.nama }}</div>
-                                        <div class="text-success fw-bold">{{ formatRupiah(product.harga_jual) }}</div>
-                                        <div class="mt-2">
-                                            <span class="badge badge-light-primary">Stok: {{ product.stok }}</span>
+
+                                    <!-- Foto Produk -->
+                                    <div class="card-img-top overflow-hidden"
+                                        style="height:130px;background:#f1f5ff;">
+                                        <img v-if="product.foto"
+                                            :src="'/storage/' + product.foto"
+                                            :alt="product.nama"
+                                            class="w-100 h-100 object-fit-cover" />
+                                        <div v-else
+                                            class="w-100 h-100 d-flex align-items-center justify-content-center"
+                                            style="font-size:3rem;">
+                                            📦
+                                        </div>
+                                    </div>
+
+                                    <div class="card-body p-3 text-center">
+                                        <div class="fs-7 fw-bold text-gray-800 mb-1 text-truncate">{{ product.nama }}</div>
+                                        <div class="text-muted fs-8 mb-1">{{ product.category?.nama }}</div>
+                                        <div class="text-success fw-bold fs-7">{{ formatRupiah(product.harga_jual) }}</div>
+                                        <div class="mt-1">
+                                            <span class="badge badge-light-primary fs-8">Stok: {{ product.stok }}</span>
                                         </div>
                                     </div>
                                 </div>
@@ -56,6 +71,19 @@
 
                         <div v-for="(item, i) in cart" :key="i"
                             class="d-flex align-items-center justify-content-between mb-4 border-bottom pb-3">
+                            <!-- Thumbnail kecil di keranjang -->
+                            <div class="me-3 flex-shrink-0">
+                                <img v-if="item.foto"
+                                    :src="'/storage/' + item.foto"
+                                    :alt="item.nama"
+                                    class="rounded object-fit-cover"
+                                    style="width:40px;height:40px;" />
+                                <div v-else
+                                    class="rounded d-flex align-items-center justify-content-center"
+                                    style="width:40px;height:40px;background:#f1f5ff;font-size:1.2rem;">
+                                    📦
+                                </div>
+                            </div>
                             <div class="flex-grow-1">
                                 <div class="fw-bold text-gray-800 fs-7">{{ item.nama }}</div>
                                 <div class="text-muted fs-8">{{ formatRupiah(item.harga_jual) }}</div>
@@ -174,8 +202,6 @@
             <div class="modal-dialog modal-dialog-centered" style="max-width: 380px;">
                 <div class="modal-content">
                     <div class="modal-body p-0">
-
-                        <!-- Struk -->
                         <div id="struk" class="p-6" style="font-family: monospace;">
                             <div class="text-center mb-4">
                                 <div class="fs-4 fw-bolder">🏪 POS APP</div>
@@ -187,9 +213,7 @@
                                 <div class="fs-8 text-muted">Kasir: {{ receipt.user?.name }}</div>
                                 <div v-if="receipt.member" class="fs-8 text-muted">Member: {{ receipt.member.nama }}</div>
                             </div>
-
                             <div class="border-bottom border-dashed mb-3"></div>
-
                             <div v-for="item in receipt.items" :key="item.id" class="mb-2">
                                 <div class="fw-bold fs-7">{{ item.product.nama }}</div>
                                 <div class="d-flex justify-content-between fs-8 text-muted">
@@ -197,42 +221,30 @@
                                     <span>{{ formatRupiah(item.subtotal) }}</span>
                                 </div>
                             </div>
-
                             <div class="border-top border-dashed my-3"></div>
-
                             <div class="d-flex justify-content-between fs-7 mb-1">
-                                <span>Subtotal</span>
-                                <span>{{ formatRupiah(receipt.subtotal) }}</span>
+                                <span>Subtotal</span><span>{{ formatRupiah(receipt.subtotal) }}</span>
                             </div>
                             <div v-if="receipt.diskon > 0" class="d-flex justify-content-between fs-7 mb-1 text-danger">
-                                <span>Diskon</span>
-                                <span>- {{ formatRupiah(receipt.diskon) }}</span>
+                                <span>Diskon</span><span>- {{ formatRupiah(receipt.diskon) }}</span>
                             </div>
                             <div class="d-flex justify-content-between fw-bolder fs-5 mb-1">
-                                <span>TOTAL</span>
-                                <span>{{ formatRupiah(receipt.total) }}</span>
+                                <span>TOTAL</span><span>{{ formatRupiah(receipt.total) }}</span>
                             </div>
                             <div class="d-flex justify-content-between fs-7 text-muted mb-1">
                                 <span>Bayar ({{ receipt.metode_bayar.toUpperCase() }})</span>
                                 <span>{{ formatRupiah(receipt.bayar) }}</span>
                             </div>
                             <div class="d-flex justify-content-between fs-7 text-success fw-bold">
-                                <span>Kembali</span>
-                                <span>{{ formatRupiah(receipt.kembali) }}</span>
+                                <span>Kembali</span><span>{{ formatRupiah(receipt.kembali) }}</span>
                             </div>
-
                             <div class="border-top border-dashed my-3"></div>
                             <div class="text-center text-muted fs-8">Terima kasih sudah berbelanja! 🙏</div>
                         </div>
-
                     </div>
                     <div class="modal-footer gap-3 justify-content-center">
-                        <button @click="printStruk" class="btn btn-primary btn-sm">
-                            🖨️ Print Struk
-                        </button>
-                        <button @click="receipt = null" class="btn btn-light btn-sm">
-                            Transaksi Baru
-                        </button>
+                        <button @click="printStruk" class="btn btn-primary btn-sm">🖨️ Print Struk</button>
+                        <button @click="receipt = null" class="btn btn-light btn-sm">Transaksi Baru</button>
                     </div>
                 </div>
             </div>
@@ -250,8 +262,7 @@ import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue'
 const props = defineProps({ products: Array, members: Array })
 const page  = usePage()
 
-const nilaiPerPoin = 1000 // 1 poin = Rp 1.000
-
+const nilaiPerPoin = 1000
 const search  = ref('')
 const cart    = ref([])
 const receipt = ref(null)
@@ -267,9 +278,7 @@ const selectedMember = computed(() =>
     props.members.find(m => m.id === form.member_id) ?? null
 )
 
-const onMemberChange = () => {
-    form.redeem_poin = 0
-}
+const onMemberChange = () => { form.redeem_poin = 0 }
 
 const addToCart = (product) => {
     const existing = cart.value.find(i => i.id === product.id)

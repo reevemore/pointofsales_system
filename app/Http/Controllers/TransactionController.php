@@ -126,11 +126,18 @@ if ($trx) {
         'transaction' => $trx,
     ]);
 }
-    public function history()
+    public function history(Request $request)
     {
         $transactions = Transaction::with(['user', 'member', 'items.product'])
+            ->when($request->search, function ($q) use ($request) {
+                $q->where('no_transaksi', 'like', '%' . $request->search . '%')
+                  ->orWhereHas('member', fn($m) => $m->where('nama', 'like', '%' . $request->search . '%'));
+            })
+            ->when($request->metode, fn($q) => $q->where('metode_bayar', $request->metode))
             ->latest()
-            ->paginate(15);
+            ->paginate(15)
+            ->withQueryString();
+
         return Inertia::render('POS/History', [
             'transactions' => $transactions,
         ]);
