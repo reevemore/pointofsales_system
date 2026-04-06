@@ -6,4 +6,7 @@ return [
 
     // 1 poin = Rp 1.000 diskon saat redeem
     'nilai_per_poin'  => 1000,
+
+    // Maksimum poin yang bisa dimiliki member
+    'max_poin'        => 15,
 ];
