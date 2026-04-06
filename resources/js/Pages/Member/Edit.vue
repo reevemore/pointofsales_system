@@ -1,5 +1,6 @@
 <template>
     <AuthenticatedLayout>
+        <Head title="Edit Member" />
 
         <div class="d-flex flex-wrap flex-stack mb-6">
             <h3 class="fw-bolder my-2">Edit Member</h3>
@@ -72,13 +73,21 @@
                         </div>
                     </div>
 
+                    <!-- STATUS TOGGLE -->
                     <div class="row mb-6">
-                        <label class="col-lg-3 col-form-label required fw-bold fs-6">Status</label>
-                        <div class="col-lg-9">
-                            <select v-model="form.status" class="form-select form-select-solid">
-                                <option value="aktif">Aktif</option>
-                                <option value="nonaktif">Non-aktif</option>
-                            </select>
+                        <label class="col-lg-3 col-form-label fw-bold fs-6">Status</label>
+                        <div class="col-lg-9 d-flex align-items-center">
+                            <div class="form-check form-switch form-check-custom form-check-solid">
+                                <input
+                                    class="form-check-input"
+                                    type="checkbox"
+                                    v-model="statusAktif"
+                                    id="statusToggle"
+                                />
+                                <label class="form-check-label fw-semibold ms-2" for="statusToggle">
+                                    {{ statusAktif ? 'Aktif' : 'Non-aktif' }}
+                                </label>
+                            </div>
                         </div>
                     </div>
 
@@ -100,10 +109,16 @@
 </template>
 
 <script setup>
-import { Link, useForm } from '@inertiajs/vue3'
+import { ref, watch } from 'vue'
+import { Link, useForm, Head } from '@inertiajs/vue3'
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue'
+import { useSwal } from '@/Composables/useSwal'
 
 const props = defineProps({ member: Object })
+
+const { showSuccess, showError } = useSwal()
+
+const statusAktif = ref(props.member.status === 'aktif')
 
 const form = useForm({
     nama: props.member.nama,
@@ -114,7 +129,14 @@ const form = useForm({
     status: props.member.status,
 })
 
+watch(statusAktif, (val) => {
+    form.status = val ? 'aktif' : 'nonaktif'
+})
+
 const submit = () => {
-    form.put(route('members.update', props.member.id))
+    form.put(route('members.update', props.member.id), {
+        onSuccess: () => showSuccess(`Data member ${form.nama} berhasil diperbarui.`),
+        onError: () => showError('Periksa kembali isian form.'),
+    })
 }
 </script>

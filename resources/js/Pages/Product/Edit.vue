@@ -100,7 +100,7 @@
                                     class="btn btn-sm btn-light-danger mt-2">Batal Ganti</button>
                             </div>
 
-                            <!-- Upload area (tampil jika: tidak ada foto lama, atau mode ganti, atau foto lama dihapus) -->
+                            <!-- Upload area -->
                             <div v-if="showUploadArea && !previewUrl"
                                 @click="$refs.fotoInput.click()"
                                 @dragover.prevent
@@ -201,8 +201,11 @@
 import { ref, computed } from 'vue'
 import { Head, Link, useForm } from '@inertiajs/vue3'
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue'
+import { useSwal } from '@/Composables/useSwal'
 
 const props = defineProps({ product: Object, categories: Array })
+
+const { showSuccess, showError } = useSwal()
 
 const fotoInput = ref(null)
 const previewUrl = ref(null)
@@ -272,6 +275,8 @@ const batalHapusFoto = () => {
 const submit = () => {
     form.post(route('products.update', props.product.id), {
         forceFormData: true,
+        onSuccess: () => showSuccess(`Produk ${form.nama} berhasil diperbarui.`),
+        onError: () => showError('Periksa kembali isian form.'),
     })
 }
 </script>

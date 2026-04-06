@@ -20,7 +20,7 @@ const flash = computed(() => (page.props.flash as Flash) ?? {});
 </script>
 
 <template>
-    <Head title="Profile - POSCok" />
+    <Head title="Profile" />
 
     <AuthenticatedLayout>
         <div class="container-xxl">

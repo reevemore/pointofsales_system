@@ -19,15 +19,6 @@
                 </div>
             </div>
 
-            <!-- Flash Message -->
-            <div v-if="$page.props.flash?.success"
-                class="alert alert-success d-flex align-items-center mb-5">
-                <i class="ki-duotone ki-shield-tick fs-2hx text-success me-3">
-                    <span class="path1"></span><span class="path2"></span>
-                </i>
-                <div>{{ $page.props.flash.success }}</div>
-            </div>
-
             <!-- Form -->
             <div class="row justify-content-center">
                 <div class="col-xl-10">
@@ -97,6 +88,9 @@
 import { Link, useForm } from '@inertiajs/vue3'
 import { Head } from '@inertiajs/vue3'
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue'
+import { useSwal } from '@/Composables/useSwal'
+
+const { showSuccess, showError } = useSwal()
 
 const form = useForm({
     nama: '',
@@ -105,6 +99,9 @@ const form = useForm({
 })
 
 const submit = () => {
-    form.post(route('categories.store'))
+    form.post(route('categories.store'), {
+        onSuccess: () => showSuccess(`Kategori ${form.nama} berhasil ditambahkan.`),
+        onError: () => showError('Periksa kembali isian form.'),
+    })
 }
 </script>

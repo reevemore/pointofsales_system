@@ -19,15 +19,6 @@
                 </div>
             </div>
 
-            <!-- Flash Message -->
-            <div v-if="$page.props.flash?.success"
-                class="alert alert-success d-flex align-items-center mb-5">
-                <i class="ki-duotone ki-shield-tick fs-2hx text-success me-3">
-                    <span class="path1"></span><span class="path2"></span>
-                </i>
-                <div>{{ $page.props.flash.success }}</div>
-            </div>
-
             <!-- Categories Table -->
             <div class="card card-flush">
                 <div class="card-header border-0 pt-6">
@@ -101,7 +92,7 @@
                                             </i>
                                             Edit
                                         </Link>
-                                        <button @click="confirmDelete(cat)"
+                                        <button @click="hapus(cat)"
                                             class="btn btn-sm btn-light-danger">
                                             <i class="ki-duotone ki-trash fs-2">
                                                 <span class="path1"></span><span class="path2"></span>
@@ -118,39 +109,20 @@
                 </div>
             </div>
         </div>
-
-        <!-- Modal Hapus -->
-        <div class="modal fade" id="deleteModal" tabindex="-1">
-            <div class="modal-dialog modal-dialog-centered">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title">Konfirmasi Hapus</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                    </div>
-                    <div class="modal-body">
-                        Yakin ingin menghapus kategori
-                        <strong>{{ selectedCat?.nama }}</strong>?
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-light" data-bs-dismiss="modal">Batal</button>
-                        <button type="button" class="btn btn-danger" @click="deleteCategory">Hapus</button>
-                    </div>
-                </div>
-            </div>
-        </div>
     </AuthenticatedLayout>
 </template>
 
 <script setup>
-import { ref, computed } from 'vue'
-import { Link, router } from '@inertiajs/vue3'
-import { Head } from '@inertiajs/vue3'
+import { ref, computed, onMounted } from 'vue'
+import { Head, Link, router, usePage } from '@inertiajs/vue3'
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue'
+import { useSwal } from '@/Composables/useSwal'
 
 const props = defineProps({ categories: Object })
 
+const { confirmDelete, showSuccess } = useSwal()
+const page = usePage()
 const search = ref('')
-const selectedCat = ref(null)
 
 const filteredCategories = computed(() => {
     if (!search.value) return props.categories.data
@@ -159,17 +131,18 @@ const filteredCategories = computed(() => {
     )
 })
 
-const confirmDelete = (cat) => {
-    selectedCat.value = cat
-    const modal = new bootstrap.Modal(document.getElementById('deleteModal'))
-    modal.show()
-}
+onMounted(() => {
+    if (page.props.flash?.success) {
+        showSuccess(page.props.flash.success)
+    }
+})
 
-const deleteCategory = () => {
-    router.delete(route('categories.destroy', selectedCat.value.id), {
-        onSuccess: () => {
-            bootstrap.Modal.getInstance(document.getElementById('deleteModal')).hide()
-        }
-    })
+const hapus = async (cat) => {
+    const result = await confirmDelete(cat.nama, 'kategori')
+    if (result.isConfirmed) {
+        router.delete(route('categories.destroy', cat.id), {
+            onSuccess: () => showSuccess(`Kategori ${cat.nama} berhasil dihapus.`),
+        })
+    }
 }
 </script>

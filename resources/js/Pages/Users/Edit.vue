@@ -19,15 +19,6 @@
                 </div>
             </div>
 
-            <!-- Flash Message -->
-            <div v-if="$page.props.flash?.success"
-                class="alert alert-success d-flex align-items-center mb-5">
-                <i class="ki-duotone ki-shield-tick fs-2hx text-success me-3">
-                    <span class="path1"></span><span class="path2"></span>
-                </i>
-                <div>{{ $page.props.flash.success }}</div>
-            </div>
-
             <!-- Form -->
             <div class="row justify-content-center">
                 <div class="col-xl-8">
@@ -99,8 +90,11 @@
 import { Link, useForm } from '@inertiajs/vue3'
 import { Head } from '@inertiajs/vue3'
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue'
+import { useSwal } from '@/Composables/useSwal'
 
 const props = defineProps({ user: Object, roles: Array })
+
+const { showSuccess, showError } = useSwal()
 
 const form = useForm({
     name:                  props.user.name,
@@ -110,5 +104,10 @@ const form = useForm({
     role:                  props.user.roles[0]?.name ?? '',
 })
 
-const submit = () => form.put(route('users.update', props.user.id))
+const submit = () => {
+    form.put(route('users.update', props.user.id), {
+        onSuccess: () => showSuccess(`User ${form.name} berhasil diperbarui.`),
+        onError: () => showError('Periksa kembali isian form.'),
+    })
+}
 </script>

@@ -29,15 +29,6 @@
                 </div>
             </div>
 
-            <!-- Flash Message -->
-            <div v-if="$page.props.flash?.success"
-                class="alert alert-success d-flex align-items-center mb-5">
-                <i class="ki-duotone ki-shield-tick fs-2hx text-success me-3">
-                    <span class="path1"></span><span class="path2"></span>
-                </i>
-                <div>{{ $page.props.flash.success }}</div>
-            </div>
-
             <div class="row g-6">
 
                 <!-- Form Update Stok -->
@@ -197,16 +188,18 @@
 </template>
 
 <script setup>
-import { computed, ref } from 'vue'
-import { Link, useForm } from '@inertiajs/vue3'
-import { Head } from '@inertiajs/vue3'
+import { computed, ref, onMounted } from 'vue'
+import { Head, Link, useForm, usePage } from '@inertiajs/vue3'
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue'
+import { useSwal } from '@/Composables/useSwal'
 
 const props = defineProps({
     products: Array,
     lowStock: Array
 })
 
+const { confirmStock, showSuccess, showError } = useSwal()
+const page = usePage()
 const search = ref('')
 
 const filteredProducts = computed(() => {
@@ -223,9 +216,32 @@ const form = useForm({
     keterangan: '',
 })
 
-const submit = () => {
-    form.post(route('stock.store'), {
-        onSuccess: () => form.reset('qty', 'keterangan'),
-    })
+onMounted(() => {
+    if (page.props.flash?.success) {
+        showSuccess(page.props.flash.success)
+    }
+})
+
+const submit = async () => {
+    if (!form.product_id) {
+        showError('Pilih produk terlebih dahulu.', 'Produk Belum Dipilih')
+        return
+    }
+    if (!form.qty || form.qty < 1) {
+        showError('Jumlah harus lebih dari 0.', 'Jumlah Tidak Valid')
+        return
+    }
+
+    const produk = props.products.find(p => p.id === form.product_id)
+    const result = await confirmStock(produk?.nama ?? 'produk', form.qty, form.type)
+
+    if (result.isConfirmed) {
+        form.post(route('stock.store'), {
+            onSuccess: () => {
+                form.reset('qty', 'keterangan')
+                showSuccess('Stok berhasil diperbarui!')
+            },
+        })
+    }
 }
 </script>

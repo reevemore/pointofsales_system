@@ -19,15 +19,6 @@
                 </div>
             </div>
 
-            <!-- Flash Message -->
-            <div v-if="$page.props.flash?.success"
-                class="alert alert-success d-flex align-items-center mb-5">
-                <i class="ki-duotone ki-shield-tick fs-2hx text-success me-3">
-                    <span class="path1"></span><span class="path2"></span>
-                </i>
-                <div>{{ $page.props.flash.success }}</div>
-            </div>
-
             <!-- Users Table -->
             <div class="card card-flush">
                 <div class="card-header border-0 pt-6">
@@ -120,16 +111,15 @@
 </template>
 
 <script setup>
-import { computed, ref } from 'vue'
-import { Link } from '@inertiajs/vue3'
-import { router, usePage } from '@inertiajs/vue3'
-import { Head } from '@inertiajs/vue3'
+import { computed, ref, onMounted } from 'vue'
+import { Head, Link, router, usePage } from '@inertiajs/vue3'
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue'
+import { useSwal } from '@/Composables/useSwal'
 
-const props = defineProps({
-    users: Array
-})
+const props = defineProps({ users: Array })
 
+const { confirmDelete, showSuccess } = useSwal()
+const page = usePage()
 const search = ref('')
 
 const filteredUsers = computed(() => {
@@ -140,9 +130,18 @@ const filteredUsers = computed(() => {
     )
 })
 
-const hapus = (user) => {
-    if (confirm(`Hapus user ${user.name}?`)) {
-        router.delete(route('users.destroy', user.id))
+onMounted(() => {
+    if (page.props.flash?.success) {
+        showSuccess(page.props.flash.success)
+    }
+})
+
+const hapus = async (user) => {
+    const result = await confirmDelete(user.name, 'user')
+    if (result.isConfirmed) {
+        router.delete(route('users.destroy', user.id), {
+            onSuccess: () => showSuccess(`User ${user.name} berhasil dihapus.`),
+        })
     }
 }
 </script>

@@ -179,8 +179,11 @@
 import { ref } from 'vue'
 import { Head, Link, useForm } from '@inertiajs/vue3'
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue'
+import { useSwal } from '@/Composables/useSwal'
 
 defineProps({ categories: Array })
+
+const { showSuccess, showError } = useSwal()
 
 const fotoInput = ref(null)
 const previewUrl = ref(null)
@@ -220,6 +223,8 @@ const clearFoto = () => {
 const submit = () => {
     form.post(route('products.store'), {
         forceFormData: true,
+        onSuccess: () => showSuccess(`Produk ${form.nama} berhasil ditambahkan.`),
+        onError: () => showError('Periksa kembali isian form.'),
     })
 }
 </script>

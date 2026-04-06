@@ -94,6 +94,9 @@
 <script setup>
 import { Head, Link, useForm } from '@inertiajs/vue3'
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue'
+import { useSwal } from '@/Composables/useSwal'
+
+const { showSuccess, showError } = useSwal()
 
 const form = useForm({
     nama: '',
@@ -104,6 +107,9 @@ const form = useForm({
 })
 
 const submit = () => {
-    form.post(route('members.store'))
+    form.post(route('members.store'), {
+        onSuccess: () => showSuccess(`Member ${form.nama} berhasil ditambahkan.`),
+        onError: () => showError('Periksa kembali isian form.'),
+    })
 }
 </script>
