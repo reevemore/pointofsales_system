@@ -1,68 +1,110 @@
+<template>
+    <Head title="Lupa Password" />
+
+    <div class="d-flex flex-column flex-root" id="kt_app_root" style="min-height: 100vh;">
+        <div class="d-flex flex-column flex-lg-row flex-column-fluid" style="min-height: 100vh;">
+
+            <!-- Panel kiri -->
+            <div class="d-flex flex-lg-row-fluid w-lg-50 bgi-size-cover bgi-position-center"
+                style="background-color: #1e1e2d; min-height: 100vh;">
+                <div class="d-flex flex-column flex-center py-15 px-5 px-md-15 w-100">
+                    <a href="/" class="mb-12">
+                        <img alt="Logo" src="/metronic/media/logos/keenthemes-dark.svg" class="h-75px" />
+                    </a>
+                    <img class="mx-auto w-275px w-md-50 w-xl-500px mb-10 mb-lg-20"
+                        src="/metronic/media/misc/outdoor.png" alt="" />
+                    <h1 class="text-white fs-2qx fw-bolder text-center mb-7">
+                        Fast, Efficient and Productive
+                    </h1>
+                    <div class="text-white fs-base text-center">
+                        Sistem Point of Sale modern untuk bisnis kamu
+                    </div>
+                </div>
+            </div>
+
+            <!-- Panel kanan -->
+            <div class="d-flex flex-column-fluid flex-lg-row-auto justify-content-center justify-content-lg-end p-12"
+                 style="min-height: 100vh;">
+                <div class="bg-body d-flex flex-column align-items-stretch flex-center rounded-4 w-md-600px p-20">
+
+                    <div class="d-flex flex-center flex-column flex-column-fluid px-lg-10 pb-15 pb-lg-20">
+                        <form class="form w-100" @submit.prevent="submit">
+
+                            <div class="text-center mb-11">
+                                <h1 class="text-gray-900 fw-bolder mb-3">Lupa Password?</h1>
+                                <div class="text-gray-500 fw-semibold fs-6">
+                                    Masukkan email kamu dan kami akan mengirimkan link reset password.
+                                </div>
+                            </div>
+
+                            <!-- Status sukses -->
+                            <div v-if="status" class="mb-6 alert alert-success d-flex align-items-center p-5">
+                                <i class="ki-duotone ki-shield-tick fs-2hx text-success me-4">
+                                    <span class="path1"></span><span class="path2"></span>
+                                </i>
+                                <div class="d-flex flex-column">
+                                    <span>{{ status }}</span>
+                                </div>
+                            </div>
+
+                            <div class="fv-row mb-8">
+                                <input
+                                    v-model="form.email"
+                                    type="email"
+                                    placeholder="Email"
+                                    class="form-control bg-transparent"
+                                    :class="{ 'is-invalid': form.errors.email }"
+                                    autofocus
+                                    autocomplete="username"
+                                />
+                                <div class="invalid-feedback" v-if="form.errors.email">
+                                    {{ form.errors.email }}
+                                </div>
+                            </div>
+
+                            <div class="d-grid mb-10">
+                                <button
+                                    type="submit"
+                                    class="btn btn-primary"
+                                    :disabled="form.processing">
+                                    <span v-if="!form.processing">Kirim Link Reset Password</span>
+                                    <span v-else>
+                                        <span class="spinner-border spinner-border-sm me-2"></span>
+                                        Memproses...
+                                    </span>
+                                </button>
+                            </div>
+
+                            <div class="text-center">
+                                <Link :href="route('login')" class="link-primary fw-semibold">
+                                    &larr; Kembali ke Halaman Masuk
+                                </Link>
+                            </div>
+
+                        </form>
+                    </div>
+
+                </div>
+            </div>
+
+        </div>
+    </div>
+</template>
+
 <script setup>
-import GuestLayout from '@/Layouts/GuestLayout.vue';
-import InputError from '@/Components/InputError.vue';
-import InputLabel from '@/Components/InputLabel.vue';
-import PrimaryButton from '@/Components/PrimaryButton.vue';
-import TextInput from '@/Components/TextInput.vue';
-import { Head, useForm } from '@inertiajs/vue3';
+import { Head, Link, useForm } from '@inertiajs/vue3'
 
 defineProps({
     status: {
         type: String,
     },
-});
+})
 
 const form = useForm({
     email: '',
-});
+})
 
 const submit = () => {
-    form.post(route('password.email'));
-};
+    form.post(route('password.email'))
+}
 </script>
-
-<template>
-    <GuestLayout>
-        <Head title="Forgot Password" />
-
-        <div class="mb-4 text-sm text-gray-600">
-            Forgot your password? No problem. Just let us know your email
-            address and we will email you a password reset link that will allow
-            you to choose a new one.
-        </div>
-
-        <div
-            v-if="status"
-            class="mb-4 text-sm font-medium text-green-600"
-        >
-            {{ status }}
-        </div>
-
-        <form @submit.prevent="submit">
-            <div>
-                <InputLabel for="email" value="Email" />
-
-                <TextInput
-                    id="email"
-                    type="email"
-                    class="mt-1 block w-full"
-                    v-model="form.email"
-                    required
-                    autofocus
-                    autocomplete="username"
-                />
-
-                <InputError class="mt-2" :message="form.errors.email" />
-            </div>
-
-            <div class="mt-4 flex items-center justify-end">
-                <PrimaryButton
-                    :class="{ 'opacity-25': form.processing }"
-                    :disabled="form.processing"
-                >
-                    Email Password Reset Link
-                </PrimaryButton>
-            </div>
-        </form>
-    </GuestLayout>
-</template>
