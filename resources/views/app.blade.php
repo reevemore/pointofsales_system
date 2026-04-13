@@ -8,6 +8,12 @@
     <meta name="csrf-token" content="{{ csrf_token() }}" />
 
     <title inertia>{{ config('app.name', 'POS App') }}</title>
+
+    {{-- Midtrans Snap JS --}}
+    <script
+      src="{{ config('midtrans.snap_url') }}"
+      data-client-key="{{ config('midtrans.client_key') }}">
+    </script>
     
     <!-- Favicon -->
     <link rel="icon" type="image/ico" href="{{asset('favicon.ico')}}">

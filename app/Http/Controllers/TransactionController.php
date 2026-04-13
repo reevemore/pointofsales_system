@@ -30,6 +30,10 @@ class TransactionController extends Controller
             'bayar'              => 'required|numeric|min:0',
             'metode_bayar'       => 'required|in:tunai,transfer,qris',
             'redeem_poin'        => 'nullable|integer|min:0',
+            // Kolom baru untuk Midtrans
+            'payment_method'     => 'required|in:tunai,transfer,qris',
+            'midtrans_order_id'  => 'nullable|string',
+            'payment_status'     => 'nullable|in:pending,paid,failed',
         ]);
 
         $trx = null;
@@ -55,7 +59,7 @@ class TransactionController extends Controller
             }
 
             // Hitung diskon dari redeem poin
-            $member       = $request->member_id ? \App\Models\Member::find($request->member_id) : null;
+            $member       = $request->member_id ? Member::find($request->member_id) : null;
             $redeemPoin   = 0;
             $diskonRedeem = 0;
 
@@ -69,14 +73,18 @@ class TransactionController extends Controller
             $kembali = $request->bayar - $total;
 
             $trx = Transaction::create([
-                'user_id'      => Auth::id(),
-                'member_id'    => $request->member_id ?: null,
-                'subtotal'     => $subtotal,
-                'diskon'       => $diskon,
-                'total'        => $total,
-                'bayar'        => $request->bayar,
-                'kembali'      => $kembali,
-                'metode_bayar' => $request->metode_bayar,
+                'user_id'           => Auth::id(),
+                'member_id'         => $request->member_id ?: null,
+                'subtotal'          => $subtotal,
+                'diskon'            => $diskon,
+                'total'             => $total,
+                'bayar'             => $request->bayar,
+                'kembali'           => $kembali,
+                'metode_bayar'      => $request->metode_bayar,
+                // Kolom baru Midtrans
+                'payment_method'    => $request->payment_method,
+                'midtrans_order_id' => $request->midtrans_order_id ?? null,
+                'payment_status'    => $request->payment_status ?? 'paid',
             ]);
 
             foreach ($items as $item) {

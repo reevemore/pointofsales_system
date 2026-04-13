@@ -9,7 +9,9 @@ class Transaction extends Model
     protected $fillable = [
         'no_transaksi', 'user_id', 'member_id',
         'subtotal', 'diskon', 'total',
-        'bayar', 'kembali', 'metode_bayar',
+        'bayar', 'kembali', 'metode_bayar', 'payment_method',
+        'midtrans_order_id',
+        'payment_status',
     ];
 
     protected static function boot()

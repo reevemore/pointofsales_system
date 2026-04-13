@@ -14,6 +14,7 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\LaporanController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\StockController;
+use App\Http\Controllers\PaymentController;
 
 
 /*
@@ -53,6 +54,14 @@ Route::middleware('auth')->group(function () {
     Route::get('pos/{transaction}/receipt', [TransactionController::class, 'show'])->name('pos.receipt');
     Route::get('members/{member}/poin', [MemberController::class, 'poinHistory'])->name('members.poin');
 
+    // Payment API untuk POS Midtrans
+    Route::post('payment/transfer', [PaymentController::class, 'createTransfer'])
+        ->name('payment.transfer');
+    Route::post('payment/qris', [PaymentController::class, 'createQris'])
+        ->name('payment.qris');
+    Route::get('payment/status/{order}', [PaymentController::class, 'checkStatus'])
+        ->name('payment.status');
+
     // Admin only
     Route::middleware('role:admin')->group(function () {
         Route::resource('members', MemberController::class)->except(['show']);
@@ -66,5 +75,10 @@ Route::middleware('auth')->group(function () {
         Route::get('stock/{product}/history', [StockController::class, 'history'])->name('stock.history');
     });
 });
+
+// Midtrans notification harus publik agar sandbox dapat mengirim webhook
+Route::post('payment/notification', [PaymentController::class, 'notification'])
+    ->withoutMiddleware(\Illuminate\Foundation\Http\Middleware\VerifyCsrfToken::class)
+    ->name('payment.notification');
 
 require __DIR__.'/auth.php';

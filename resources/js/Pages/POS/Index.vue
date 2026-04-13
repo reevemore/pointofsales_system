@@ -173,22 +173,11 @@
                                 </div>
                             </div>
 
-                            <div class="mb-6">
-                                <label class="form-label fw-bold fs-7">Metode Pembayaran</label>
-                                <div class="d-flex gap-3">
-                                    <label v-for="m in metodes" :key="m.value"
-                                        class="d-flex align-items-center gap-2 cursor-pointer">
-                                        <input type="radio" v-model="form.metode_bayar" :value="m.value" />
-                                        <span>{{ m.label }}</span>
-                                    </label>
-                                </div>
-                            </div>
-
-                            <button @click="submit"
-                                :disabled="form.processing || form.bayar < total"
+                            <!-- TOMBOL BAYAR - Buka Modal -->
+                            <button @click="bukaModalPembayaran"
+                                :disabled="cart.length === 0"
                                 class="btn btn-primary w-100 btn-lg">
-                                <span v-if="form.processing">Memproses...</span>
-                                <span v-else>💳 Bayar {{ formatRupiah(total) }}</span>
+                                💳 Bayar — {{ formatRupiah(total) }}
                             </button>
                         </div>
 
@@ -244,11 +233,23 @@
                     </div>
                     <div class="modal-footer gap-3 justify-content-center">
                         <button @click="printStruk" class="btn btn-primary btn-sm">🖨️ Print Struk</button>
-                        <button @click="receipt = null" class="btn btn-light btn-sm">Transaksi Baru</button>
+                        <button @click="startNewTransaction" class="btn btn-light btn-sm">Transaksi Baru</button>
                     </div>
                 </div>
             </div>
         </div>
+
+        <!-- PaymentModal Component -->
+        <PaymentModal
+            :show="showPaymentModal"
+            :total="total"
+            :items="itemsForMidtrans"
+            @close="showPaymentModal = false"
+            @paid-tunai="handleTunai"
+            @paid-transfer="handleTransfer"
+            @paid-qris="handleQris"
+            @print-receipt="printStruk"
+        />
 
     </AuthenticatedLayout>
 </template>
@@ -258,6 +259,7 @@ import { ref, computed } from 'vue'
 import { useForm, usePage } from '@inertiajs/vue3'
 import { Head } from '@inertiajs/vue3'
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue'
+import PaymentModal from '@/Components/PaymentModal.vue'
 
 const props = defineProps({ products: Array, members: Array })
 const page  = usePage()
@@ -266,6 +268,7 @@ const nilaiPerPoin = 1000
 const search  = ref('')
 const cart    = ref([])
 const receipt = ref(null)
+const showPaymentModal = ref(false)
 
 const filteredProducts = computed(() => {
     if (!search.value) return props.products
@@ -276,6 +279,16 @@ const filteredProducts = computed(() => {
 
 const selectedMember = computed(() =>
     props.members.find(m => m.id === form.member_id) ?? null
+)
+
+// Items untuk Midtrans
+const itemsForMidtrans = computed(() =>
+    cart.value.map(item => ({
+        id:    item.id,
+        name:  item.nama,
+        price: Math.round(item.harga_jual),
+        qty:   item.qty,
+    }))
 )
 
 const onMemberChange = () => { form.redeem_poin = 0 }
@@ -303,19 +316,17 @@ const total    = computed(() =>
 )
 
 const form = useForm({
-    member_id:    '',
-    diskon:       0,
-    bayar:        0,
-    metode_bayar: 'tunai',
-    redeem_poin:  0,
-    items:        [],
+    member_id:          '',
+    diskon:             0,
+    bayar:              0,
+    metode_bayar:       'tunai',
+    redeem_poin:        0,
+    items:              [],
+    // Kolom baru Midtrans
+    payment_method:     'tunai',
+    midtrans_order_id:  null,
+    payment_status:     'paid',
 })
-
-const metodes = [
-    { value: 'tunai',    label: 'Tunai' },
-    { value: 'transfer', label: 'Transfer' },
-    { value: 'qris',     label: 'QRIS' },
-]
 
 const formatRupiah = (val) => new Intl.NumberFormat('id-ID', {
     style: 'currency', currency: 'IDR', minimumFractionDigits: 0
@@ -326,20 +337,75 @@ const formatDate = (val) => new Date(val).toLocaleString('id-ID', {
     hour: '2-digit', minute: '2-digit'
 })
 
-const submit = () => {
-    form.items = cart.value.map(i => ({ product_id: i.id, qty: i.qty }))
+// Buka modal pembayaran
+function bukaModalPembayaran() {
+    receipt.value = null
+    showPaymentModal.value = true
+}
+
+// Handle Tunai
+function handleTunai() {
+    showPaymentModal.value = false
+    simpanTransaksi('tunai')
+}
+
+// Handle Transfer
+function handleTransfer({ orderId, result, pending }) {
+    simpanTransaksi('transfer', {
+        midtrans_order_id: orderId,
+        payment_status: pending ? 'pending' : 'paid',
+    })
+}
+
+// Handle QRIS
+function handleQris({ orderId }) {
+    simpanTransaksi('qris', {
+        midtrans_order_id: orderId,
+        payment_status: 'paid',
+    })
+}
+
+// Fungsi simpan transaksi
+function simpanTransaksi(paymentMethod = 'tunai', extraData = {}) {
+    form.items           = cart.value.map(i => ({ product_id: i.id, qty: i.qty }))
+    form.payment_method  = paymentMethod
+    form.metode_bayar    = paymentMethod
+    form.midtrans_order_id = extraData.midtrans_order_id ?? null
+    form.payment_status    = extraData.payment_status ?? 'paid'
+
     form.post(route('pos.store'), {
         onSuccess: () => {
+            resetTransaction()
             const trx = page.props.flash?.transaction
             if (trx) receipt.value = trx
-            clearCart()
-            form.reset()
+            showPaymentModal.value = false
+            if (paymentMethod === 'tunai') printStruk()
         }
     })
 }
 
+function startNewTransaction() {
+    receipt.value = null
+    resetTransaction()
+}
+
+function resetTransaction() {
+    clearCart()
+    form.reset()
+    form.member_id        = ''
+    form.diskon           = 0
+    form.bayar            = 0
+    form.metode_bayar     = 'tunai'
+    form.redeem_poin      = 0
+    form.items            = []
+    form.payment_method   = 'tunai'
+    form.midtrans_order_id = null
+    form.payment_status    = 'paid'
+}
+
 const printStruk = () => {
     const content = document.getElementById('struk').innerHTML
+    receipt.value = null
     const win = window.open('', '_blank', 'width=400,height=600')
     win.document.write(`
         <html><head><title>Struk</title>
