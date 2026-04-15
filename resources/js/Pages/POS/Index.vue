@@ -194,7 +194,7 @@
                         <div id="struk" class="p-6" style="font-family: monospace;">
                             <div class="text-center mb-4">
                                 <div class="fs-4 fw-bolder">🏪 POS APP</div>
-                                <div class="text-muted fs-8">Jl. Contoh No. 1, Surabaya</div>
+                                <div class="text-muted fs-8">Jl. Bungkal Gg II No 25B Sambikerep, Surabaya</div>
                                 <div class="text-muted fs-8">Telp: 08123456789</div>
                                 <div class="border-bottom border-dashed my-3"></div>
                                 <div class="fs-8 text-muted">{{ receipt.no_transaksi }}</div>
