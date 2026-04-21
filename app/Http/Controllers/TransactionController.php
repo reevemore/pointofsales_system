@@ -17,7 +17,8 @@ class TransactionController extends Controller
     {
         return Inertia::render('POS/Index', [
             'products' => Product::with('category')->where('aktif', true)->where('stok', '>', 0)->get(),
-            'members'  => Member::all(),
+            // ✅ FIX: Hanya tampilkan member dengan status 'aktif'
+            'members'  => Member::where('status', 'aktif')->orderBy('nama')->get(),
         ]);
     }
 
@@ -59,7 +60,8 @@ class TransactionController extends Controller
             }
 
             // Hitung diskon dari redeem poin
-            $member       = $request->member_id ? Member::find($request->member_id) : null;
+            // ✅ FIX: Tambahkan validasi bahwa member harus aktif sebelum bisa digunakan
+            $member       = $request->member_id ? Member::where('id', $request->member_id)->where('status', 'aktif')->first() : null;
             $redeemPoin   = 0;
             $diskonRedeem = 0;
 
@@ -74,7 +76,7 @@ class TransactionController extends Controller
 
             $trx = Transaction::create([
                 'user_id'           => Auth::id(),
-                'member_id'         => $request->member_id ?: null,
+                'member_id'         => $member ? $member->id : null,
                 'subtotal'          => $subtotal,
                 'diskon'            => $diskon,
                 'total'             => $total,
