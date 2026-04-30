@@ -23,9 +23,9 @@ class RoleSeeder extends Seeder
 
         // Buat akun kasir contoh
         $kasirUser = User::firstOrCreate(
-            ['email' => 'kasir@example.com'],
+            ['email' => 'kasir@kasir.com'],
             [
-                'name'     => 'Kasir 1',
+                'name'     => 'Kasir',
                 'password' => Hash::make('password'),
             ]
         );
