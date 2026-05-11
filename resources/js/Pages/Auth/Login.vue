@@ -79,7 +79,7 @@
                             <input v-model="form.email" type="email" placeholder="email@domain.com"
                                 class="finput" autofocus autocomplete="username" />
                         </div>
-                        <span class="errmsg" v-if="form.errors.email">{{ form.errors.email }}</span>
+
                     </div>
 
                     <div class="fg">
@@ -100,7 +100,7 @@
                                 <svg v-else width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M17.94 17.94A10.07 10.07 0 0112 20c-7 0-11-8-11-8a18.45 18.45 0 015.06-5.94M9.9 4.24A9.12 9.12 0 0112 4c7 0 11 8 11 8a18.5 18.5 0 01-2.16 3.19m-6.72-1.07a3 3 0 11-4.24-4.24" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><line x1="1" y1="1" x2="23" y2="23" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
                             </button>
                         </div>
-                        <span class="errmsg" v-if="form.errors.password">{{ form.errors.password }}</span>
+
                     </div>
 
                     <div class="remember-row">
@@ -122,20 +122,7 @@
                         </span>
                     </button>
 
-                    <div class="divider">
-                        <div class="div-line"></div>
-                        <span class="div-txt">atau masuk sebagai</span>
-                        <div class="div-line"></div>
-                    </div>
 
-                    <button type="button" class="shortcut-btn" @click="fillAdmin">
-                        <span class="shortcut-avatar">A</span>
-                        <div class="shortcut-info">
-                            <span class="shortcut-name">Administrator</span>
-                            <span class="shortcut-email">admin@admin.com</span>
-                        </div>
-                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" class="shortcut-arrow"><polyline points="9 18 15 12 9 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-                    </button>
 
                 </form>
             </div>
@@ -145,21 +132,55 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { ref, watch } from 'vue'                       
 import { useForm, Link, Head } from '@inertiajs/vue3'
+import Swal from 'sweetalert2'                         
 
 defineProps({ canResetPassword: Boolean, status: String })
 
 const form = useForm({ email: '', password: '', remember: false })
 const showPassword = ref(false)
 
-const fillAdmin = () => {
-    form.email = 'admin@admin.com'
-    form.password = 'password'
-}
-
 const submit = () => {
-    form.post(route('login'), { onFinish: () => form.reset('password') })
+    form.post(route('login'), {
+        onFinish: () => form.reset('password'),
+
+        //  onError: dipanggil otomatis jika ada error dari server
+        onError: (errors) => {
+            // Jika email tidak ditemukan / kredensial tidak cocok
+            if (errors.email) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Email Tidak Ditemukan',
+                    text: 'Email yang Anda masukkan tidak terdaftar. Silakan periksa kembali.',
+                    confirmButtonColor: '#6366f1',
+                    confirmButtonText: 'Coba Lagi',
+                })
+                return
+            }
+
+            // Jika password salah 
+            if (errors.password) {
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Password Salah',
+                    text: 'Password yang Anda masukkan tidak sesuai. Silakan periksa kembali.',
+                    confirmButtonColor: '#6366f1',
+                    confirmButtonText: 'Coba Lagi',
+                })
+                return
+            }
+
+            // Fallback: error umum lainnya
+            Swal.fire({
+                icon: 'error',
+                title: 'Login Gagal',
+                text: 'Terjadi kesalahan. Silakan coba beberapa saat lagi.',
+                confirmButtonColor: '#6366f1',
+                confirmButtonText: 'OK',
+            })
+        },
+    })
 }
 </script>
 
@@ -435,52 +456,7 @@ const submit = () => {
 }
 @keyframes spin { to { transform: rotate(360deg) } }
 
-/* Divider */
-.divider {
-    display: flex; align-items: center; gap: 12px;
-    margin-bottom: 1.25rem;
-}
-.div-line { flex: 1; height: 1px; background: #e5e7eb; }
-.div-txt { font-size: 12px; color: #9ca3af; white-space: nowrap; }
 
-/* Shortcut */
-.shortcut-btn {
-    width: 100%;
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    padding: 11px 14px;
-    background: #fff;
-    border: 1.5px solid #e5e7eb;
-    border-radius: 10px;
-    cursor: pointer;
-    font-family: inherit;
-    transition: border-color .2s, box-shadow .2s;
-    text-align: left;
-}
-.shortcut-btn:hover {
-    border-color: #6366f1;
-    box-shadow: 0 0 0 3px rgba(99,102,241,0.08);
-}
-.shortcut-avatar {
-    width: 32px; height: 32px;
-    background: #1e2129;
-    color: #fff;
-    border-radius: 8px;
-    display: flex; align-items: center; justify-content: center;
-    font-size: 13px;
-    font-weight: 700;
-    flex-shrink: 0;
-}
-.shortcut-info {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    gap: 1px;
-}
-.shortcut-name { font-size: 13px; font-weight: 600; color: #111827; }
-.shortcut-email { font-size: 12px; color: #9ca3af; }
-.shortcut-arrow { color: #9ca3af; }
 
 /* ── Responsive ── */
 @media (max-width: 768px) {

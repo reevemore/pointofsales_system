@@ -95,9 +95,10 @@
 
                                     <div class="separator my-2"></div>
 
+                                    <!-- ✅ Tombol Logout dengan SweetAlert2 -->
                                     <button
                                         class="dropdown-item d-flex align-items-center gap-3 rounded px-3 py-2 text-danger"
-                                        @click="logout">
+                                        @click="confirmLogout">
                                         <span class="d-flex align-items-center justify-content-center w-30px h-30px rounded"
                                             style="background:#fff5f5;">
                                             <i class="ki-duotone ki-exit-right fs-5 text-danger">
@@ -125,12 +126,12 @@
 <script setup>
 import { computed } from 'vue'
 import { Link, router, usePage } from '@inertiajs/vue3'
+import Swal from 'sweetalert2'  // ✅ Import SweetAlert2
 
 const page = usePage()
 const user = computed(() => page.props.auth.user)
 const role = computed(() => page.props.auth.role)
 
-// Ambil title & subtitle dari props halaman (set di controller/Inertia share)
 const pageTitle = computed(() => page.props.pageTitle ?? 'Dashboard')
 const pageSubtitle = computed(() => page.props.pageSubtitle ?? '')
 
@@ -149,5 +150,25 @@ const avatarColor = computed(() => {
     return colors[index]
 })
 
+// ✅ Fungsi logout lama (tetap ada, dipanggil setelah konfirmasi)
 const logout = () => router.post(route('logout'))
+
+// ✅ Fungsi baru: tampilkan SweetAlert2 sebelum logout
+const confirmLogout = () => {
+    Swal.fire({
+        title: 'Keluar dari Aplikasi?',
+        text: 'Apakah kamu yakin ingin keluar?',
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#f1416c',
+        cancelButtonColor: '#6c757d',
+        confirmButtonText: 'Ya, Keluar!',
+        cancelButtonText: 'Batal',
+        reverseButtons: true,
+    }).then((result) => {
+        if (result.isConfirmed) {
+            logout()
+        }
+    })
+}
 </script>
