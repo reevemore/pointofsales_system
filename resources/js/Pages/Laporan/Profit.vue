@@ -80,6 +80,29 @@
                                 </svg>
                                 Tampilkan
                             </button>
+                            <a :href="excelUrl" class="btn-export btn-export--green">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16"
+                                    viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                    stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                                    <polyline points="14 2 14 8 20 8"/>
+                                    <line x1="16" y1="13" x2="8" y2="13"/>
+                                    <line x1="16" y1="17" x2="8" y2="17"/>
+                                    <polyline points="10 9 9 9 8 9"/>
+                                </svg>
+                                Export Excel
+                            </a>
+                            <a :href="pdfUrl" class="btn-export btn-export--red">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16"
+                                    viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                    stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                                    <polyline points="14 2 14 8 20 8"/>
+                                    <line x1="12" y1="18" x2="12" y2="12"/>
+                                    <line x1="9" y1="15" x2="15" y2="15"/>
+                                </svg>
+                                Export PDF
+                            </a>
                         </div>
                     </div>
                 </div>
@@ -101,9 +124,7 @@
                         </div>
                         <div class="summary-info">
                             <span class="summary-label">Total Omzet</span>
-                            <span class="summary-value summary-value--sm">
-                                {{ formatRupiah(totalOmzet) }}
-                            </span>
+                            <span class="summary-value summary-value--sm">{{ formatRupiah(totalOmzet) }}</span>
                             <span class="summary-unit">total penjualan</span>
                         </div>
                     </div>
@@ -121,9 +142,7 @@
                         </div>
                         <div class="summary-info">
                             <span class="summary-label">Total Modal (HPP)</span>
-                            <span class="summary-value summary-value--sm">
-                                {{ formatRupiah(totalModal) }}
-                            </span>
+                            <span class="summary-value summary-value--sm">{{ formatRupiah(totalModal) }}</span>
                             <span class="summary-unit">harga pokok penjualan</span>
                         </div>
                     </div>
@@ -184,12 +203,10 @@
                     </span>
                 </div>
                 <div class="profit-bar">
-                    <div class="profit-bar-modal"
-                        :style="{ width: modalPercent + '%' }">
+                    <div class="profit-bar-modal" :style="{ width: modalPercent + '%' }">
                         {{ modalPercent }}%
                     </div>
-                    <div class="profit-bar-profit"
-                        :style="{ width: profitPercent + '%' }">
+                    <div class="profit-bar-profit" :style="{ width: profitPercent + '%' }">
                         {{ profitPercent }}%
                     </div>
                 </div>
@@ -235,8 +252,7 @@
                                 <td colspan="7" class="empty-state">
                                     <div class="empty-icon">
                                         <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40"
-                                            viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                                            stroke-width="1.5">
+                                            viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
                                             <path d="M12 20V10"/><path d="M18 20V4"/><path d="M6 20v-4"/>
                                         </svg>
                                     </div>
@@ -245,21 +261,15 @@
                             </tr>
                             <tr v-for="(row, i) in filteredData" :key="row.id" class="profit-row">
                                 <td><span class="row-no">{{ i + 1 }}</span></td>
-                                <td>
-                                    <span class="trx-no-badge">{{ row.no_transaksi }}</span>
-                                </td>
+                                <td><span class="trx-no-badge">{{ row.no_transaksi }}</span></td>
                                 <td>
                                     <div class="waktu-cell">
                                         <span class="waktu-date">{{ formatDateOnly(row.created_at) }}</span>
                                         <span class="waktu-time">{{ formatTimeOnly(row.created_at) }}</span>
                                     </div>
                                 </td>
-                                <td class="text-right">
-                                    <span class="amount-omzet">{{ formatRupiah(row.total) }}</span>
-                                </td>
-                                <td class="text-right">
-                                    <span class="amount-modal">{{ formatRupiah(row.modal) }}</span>
-                                </td>
+                                <td class="text-right"><span class="amount-omzet">{{ formatRupiah(row.total) }}</span></td>
+                                <td class="text-right"><span class="amount-modal">{{ formatRupiah(row.modal) }}</span></td>
                                 <td class="text-right">
                                     <span :class="row.profit >= 0 ? 'amount-profit' : 'amount-loss'">
                                         {{ formatRupiah(row.profit) }}
@@ -280,9 +290,7 @@
 
                 <!-- Footer -->
                 <div v-if="filteredData.length > 0" class="table-footer">
-                    <span class="footer-info">
-                        {{ filteredData.length }} transaksi
-                    </span>
+                    <span class="footer-info">{{ filteredData.length }} transaksi</span>
                     <span class="footer-total">
                         Profit: <strong :class="totalProfit >= 0 ? 'text-green' : 'text-red'">
                             {{ formatRupiah(filteredData.reduce((s, r) => s + r.profit, 0)) }}
@@ -340,6 +348,14 @@ const applyFilter = () => {
     router.get(route('laporan.profit'), filter.value, { preserveState: true })
 }
 
+const excelUrl = computed(() =>
+    route('laporan.profit.excel') + `?from=${filter.value.from}&to=${filter.value.to}`
+)
+
+const pdfUrl = computed(() =>
+    route('laporan.profit.pdf') + `?from=${filter.value.from}&to=${filter.value.to}`
+)
+
 const formatRupiah = (val) => new Intl.NumberFormat('id-ID', {
     style: 'currency', currency: 'IDR', minimumFractionDigits: 0
 }).format(val ?? 0)
@@ -383,12 +399,7 @@ const formatTimeOnly = (val) => new Date(val).toLocaleTimeString('id-ID', {
     --shadow-md: 0 8px 24px rgba(0,0,0,.08);
 }
 
-.profit-container {
-    font-family: var(--font);
-    padding: 32px;
-    background: var(--bg);
-    min-height: 100vh;
-}
+.profit-container { font-family: var(--font); padding: 32px; background: var(--bg); min-height: 100vh; }
 
 /* Header */
 .page-header { margin-bottom: 28px; }
@@ -416,8 +427,16 @@ const formatTimeOnly = (val) => new Date(val).toLocaleTimeString('id-ID', {
 .date-input:focus { border-color: var(--blue); box-shadow: 0 0 0 3px rgba(59,130,246,.1); background: white; }
 .date-separator { color: var(--text-muted); padding-bottom: 10px; }
 .filter-actions { display: flex; gap: 10px; }
-.btn-tampilkan { display: flex; align-items: center; gap: 7px; height: 40px; padding: 0 20px; background: var(--blue); color: white; border: none; border-radius: var(--radius-sm); font-family: var(--font); font-size: 13px; font-weight: 600; cursor: pointer; box-shadow: 0 2px 8px rgba(59,130,246,.3); transition: background .2s; }
-.btn-tampilkan:hover { background: #2563eb; }
+
+/* Buttons */
+.btn-tampilkan { display: inline-flex; align-items: center; gap: 7px; height: 40px; padding: 0 20px; background: var(--blue); color: #ffffff; border: none; border-radius: var(--radius-sm); font-family: var(--font); font-size: 13px; font-weight: 600; cursor: pointer; box-shadow: 0 2px 8px rgba(59,130,246,.3); transition: background .2s, transform .15s; }
+.btn-tampilkan:hover { background: #2563eb; transform: translateY(-1px); }
+.btn-export { display: inline-flex; align-items: center; gap: 7px; height: 40px; padding: 0 20px; border-radius: var(--radius-sm); font-family: var(--font); font-size: 13px; font-weight: 600; text-decoration: none; transition: background .2s, transform .15s; }
+.btn-export:hover { transform: translateY(-1px); }
+.btn-export--green { background: #16a34a; color: #ffffff !important; box-shadow: 0 2px 8px rgba(22,163,74,.3); }
+.btn-export--green:hover { background: #15803d; }
+.btn-export--red { background: #ef4444; color: #ffffff !important; box-shadow: 0 2px 8px rgba(239,68,68,.3); }
+.btn-export--red:hover { background: #dc2626; }
 
 /* Summary Grid */
 .summary-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; }
@@ -466,7 +485,6 @@ const formatTimeOnly = (val) => new Date(val).toLocaleTimeString('id-ID', {
 .search-input { height: 38px; width: 260px; padding: 0 12px 0 36px; border: 1.5px solid var(--border); border-radius: 20px; font-family: var(--font); font-size: 13px; color: var(--text-primary); background: #fafbfc; outline: none; transition: border-color .2s, box-shadow .2s; }
 .search-input:focus { border-color: var(--blue); box-shadow: 0 0 0 3px rgba(59,130,246,.1); background: white; }
 .search-input::placeholder { color: var(--text-muted); }
-
 .table-wrapper { overflow-x: auto; }
 .profit-table { width: 100%; border-collapse: collapse; font-size: 13px; }
 .profit-table thead tr { background: #f8fafc; border-bottom: 1px solid var(--border); }
