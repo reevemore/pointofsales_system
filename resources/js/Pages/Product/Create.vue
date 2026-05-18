@@ -21,7 +21,7 @@
                             <select v-model="form.category_id"
                                 class="form-select form-select-solid"
                                 :class="{ 'is-invalid': form.errors.category_id }">
-                                <option value="">Pilih Kategori mu Bos😂</option>
+                                <option value="">Pilih Kategori Produk</option>
                                 <option v-for="cat in categories" :key="cat.id" :value="cat.id">
                                     {{ cat.nama }}
                                 </option>

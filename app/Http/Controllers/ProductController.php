@@ -120,4 +120,18 @@ class ProductController extends Controller
 
         return $filename;
     }
+
+  public function byKode(string $kode)
+{
+    $product = \App\Models\Product::with('category')
+        ->where('kode_produk', $kode)     
+        ->where('aktif', 1)                  
+        ->first();
+
+    if (!$product) {
+        return response()->json(['product' => null], 404);
+    }
+
+    return response()->json(['product' => $product]);
+}
 }

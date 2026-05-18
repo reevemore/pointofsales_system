@@ -42,21 +42,8 @@
                         </Link>
                     </div>
 
-                    <!-- Profile -->
-                    <div class="menu-item" :title="props.collapsed ? 'Profile' : ''">
-                        <Link :href="route('profile.edit')" class="menu-link"
-                            :class="{ active: $page.component.startsWith('Profile') }">
-                            <span class="menu-icon">
-                                <i class="ki-duotone ki-profile-circle fs-2">
-                                    <span class="path1"></span><span class="path2"></span><span class="path3"></span>
-                                </i>
-                            </span>
-                            <span class="menu-title" v-show="!props.collapsed">Profile</span>
-                        </Link>
-                    </div>
-
                     <!-- Point of Sale -->
-                    <div class="menu-item" :title="props.collapsed ? 'Point of Sale' : ''">
+                    <div class="menu-item" :title="props.collapsed ? 'Point Of Sales' : ''">
                         <Link :href="route('pos.index')" class="menu-link"
                             :class="{ active: $page.component === 'POS/Index' }">
                             <span class="menu-icon">
@@ -65,7 +52,7 @@
                                     <span class="path3"></span><span class="path4"></span>
                                 </i>
                             </span>
-                            <span class="menu-title" v-show="!props.collapsed">Point of Sale</span>
+                            <span class="menu-title" v-show="!props.collapsed">Transaksi</span>
                         </Link>
                     </div>
 
@@ -141,17 +128,30 @@
                         </div>
 
                         <!-- Laporan -->
-                        <div class="menu-item" :title="props.collapsed ? 'Laporan' : ''">
-                            <Link :href="route('laporan.index')" class="menu-link"
-                                :class="{ active: $page.component.startsWith('Laporan') }">
-                                <span class="menu-icon">
-                                    <i class="ki-duotone ki-chart-line-up fs-2">
-                                        <span class="path1"></span><span class="path2"></span>
-                                    </i>
-                                </span>
-                                <span class="menu-title" v-show="!props.collapsed">Laporan</span>
-                            </Link>
-                        </div>
+<div class="menu-item" :title="props.collapsed ? 'Laporan' : ''">
+    <Link :href="route('laporan.index')" class="menu-link"
+        :class="{ active: $page.component === 'Laporan/Index' }">
+        <span class="menu-icon">
+            <i class="ki-duotone ki-chart-line-up fs-2">
+                <span class="path1"></span><span class="path2"></span>
+            </i>
+        </span>
+        <span class="menu-title" v-show="!props.collapsed">Laporan</span>
+    </Link>
+</div>
+
+<!-- Laporan Profit -->
+<div class="menu-item" :title="props.collapsed ? 'Laporan Profit' : ''">
+    <Link :href="route('laporan.profit')" class="menu-link"
+        :class="{ active: $page.component === 'Laporan/Profit' }">
+        <span class="menu-icon">
+            <i class="ki-duotone ki-graph-up fs-2">
+                <span class="path1"></span><span class="path2"></span>
+            </i>
+        </span>
+        <span class="menu-title" v-show="!props.collapsed">Laporan Profit</span>
+    </Link>
+</div>
 
                         <!-- Users -->
                         <div class="menu-item" :title="props.collapsed ? 'Users' : ''">

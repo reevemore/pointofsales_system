@@ -68,7 +68,11 @@ Route::middleware('auth')->group(function () {
         Route::resource('categories', CategoryController::class)->except(['show']);
         Route::resource('products', ProductController::class)->except(['show']);
         Route::get('laporan', [LaporanController::class, 'index'])->name('laporan.index');
-        Route::get('laporan/export-pdf', [LaporanController::class, 'exportPdf'])->name('laporan.pdf');
+Route::get('laporan/export-pdf', [LaporanController::class, 'exportPdf'])->name('laporan.pdf');
+Route::get('laporan/export-excel', [LaporanController::class, 'exportExcel'])->name('laporan.excel');        
+Route::get('laporan/profit', [LaporanController::class, 'profit'])->name('laporan.profit');
+Route::get('laporan/profit/export-excel', [LaporanController::class, 'profitExportExcel'])->name('laporan.profit.excel'); 
+Route::get('laporan/profit/export-pdf', [LaporanController::class, 'profitExportPdf'])->name('laporan.profit.pdf');       
         Route::resource('users', UserController::class)->except(['show']);
         Route::get('stock', [StockController::class, 'index'])->name('stock.index');
         Route::post('stock', [StockController::class, 'store'])->name('stock.store');

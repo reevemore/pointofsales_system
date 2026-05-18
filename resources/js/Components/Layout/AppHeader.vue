@@ -95,7 +95,7 @@
 
                                     <div class="separator my-2"></div>
 
-                                    <!-- ✅ Tombol Logout dengan SweetAlert2 -->
+                                    <!--  Tombol Logout dengan SweetAlert2 -->
                                     <button
                                         class="dropdown-item d-flex align-items-center gap-3 rounded px-3 py-2 text-danger"
                                         @click="confirmLogout">
@@ -126,7 +126,7 @@
 <script setup>
 import { computed } from 'vue'
 import { Link, router, usePage } from '@inertiajs/vue3'
-import Swal from 'sweetalert2'  // ✅ Import SweetAlert2
+import Swal from 'sweetalert2'  //  Import SweetAlert2
 
 const page = usePage()
 const user = computed(() => page.props.auth.user)
@@ -150,10 +150,10 @@ const avatarColor = computed(() => {
     return colors[index]
 })
 
-// ✅ Fungsi logout lama (tetap ada, dipanggil setelah konfirmasi)
+//  Fungsi logout lama (tetap ada, dipanggil setelah konfirmasi)
 const logout = () => router.post(route('logout'))
 
-// ✅ Fungsi baru: tampilkan SweetAlert2 sebelum logout
+//  Fungsi baru: tampilkan SweetAlert2 sebelum logout
 const confirmLogout = () => {
     Swal.fire({
         title: 'Keluar dari Aplikasi?',

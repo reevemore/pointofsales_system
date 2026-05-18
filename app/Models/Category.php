@@ -10,7 +10,16 @@ class Category extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['nama', 'slug', 'deskripsi', 'aktif'];
+    protected $fillable = [
+    'kode',
+    'nama',
+    'kategori_id',
+    'harga_jual',
+    'stok',
+    'foto',
+    'status',
+    // 
+];
 
     protected static function boot()
     {
