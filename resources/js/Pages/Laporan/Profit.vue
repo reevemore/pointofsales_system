@@ -372,7 +372,11 @@ const formatTimeOnly = (val) => new Date(val).toLocaleTimeString('id-ID', {
 <style scoped>
 @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
 
-:root {
+/* =============================================
+   SEMUA VARIABLE DIPINDAH KE .profit-container
+   bukan :root agar tidak bocor ke parent layout
+   ============================================= */
+.profit-container {
     --font: 'Plus Jakarta Sans', sans-serif;
     --radius: 14px;
     --radius-sm: 8px;
@@ -397,9 +401,12 @@ const formatTimeOnly = (val) => new Date(val).toLocaleTimeString('id-ID', {
     --red: #ef4444;
     --shadow-sm: 0 1px 3px rgba(0,0,0,.05);
     --shadow-md: 0 8px 24px rgba(0,0,0,.08);
-}
 
-.profit-container { font-family: var(--font); padding: 32px; background: var(--bg); min-height: 100vh; }
+    font-family: var(--font);
+    padding: 32px;
+    background: var(--bg);
+    min-height: 100vh;
+}
 
 /* Header */
 .page-header { margin-bottom: 28px; }
@@ -407,15 +414,15 @@ const formatTimeOnly = (val) => new Date(val).toLocaleTimeString('id-ID', {
 .page-title { font-size: 22px; font-weight: 800; color: var(--text-primary); margin: 0 0 4px; letter-spacing: -0.4px; }
 .page-subtitle { font-size: 13px; color: var(--text-muted); margin: 0; }
 .header-badge { display: flex; align-items: center; gap: 6px; background: var(--green-light); border: 1px solid var(--green-mid); padding: 6px 12px; border-radius: 20px; }
-.live-dot { width: 7px; height: 7px; background: var(--green); border-radius: 50%; animation: pulse 2s infinite; }
+.live-dot { width: 7px; height: 7px; background: #10b981; border-radius: 50%; animation: pulse 2s infinite; }
 @keyframes pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:.6;transform:scale(1.3)} }
-.live-text { font-size: 12px; font-weight: 600; color: var(--green); }
+.live-text { font-size: 12px; font-weight: 600; color: #10b981; }
 
 /* Filter */
 .filter-card { background: var(--surface); border-radius: var(--radius); border: 1px solid var(--border); box-shadow: var(--shadow-sm); }
 .filter-card-inner { padding: 22px 24px; }
 .filter-header { display: flex; align-items: center; gap: 12px; margin-bottom: 18px; }
-.filter-icon { width: 36px; height: 36px; background: var(--blue-light); color: var(--blue); border-radius: var(--radius-sm); display: flex; align-items: center; justify-content: center; }
+.filter-icon { width: 36px; height: 36px; background: #eff6ff; color: #3b82f6; border-radius: var(--radius-sm); display: flex; align-items: center; justify-content: center; }
 .filter-title { font-size: 14px; font-weight: 700; color: var(--text-primary); margin: 0 0 2px; }
 .filter-subtitle { font-size: 12px; color: var(--text-muted); margin: 0; }
 .filter-controls { display: flex; align-items: flex-end; gap: 12px; flex-wrap: wrap; }
@@ -424,12 +431,12 @@ const formatTimeOnly = (val) => new Date(val).toLocaleTimeString('id-ID', {
 .date-input-wrapper { position: relative; display: flex; align-items: center; }
 .date-icon { position: absolute; left: 10px; color: var(--text-muted); pointer-events: none; }
 .date-input { height: 40px; padding: 0 12px 0 34px; border: 1.5px solid var(--border); border-radius: var(--radius-sm); font-family: var(--font); font-size: 13px; font-weight: 500; color: var(--text-primary); background: #fafbfc; width: 180px; outline: none; transition: border-color .2s, box-shadow .2s; }
-.date-input:focus { border-color: var(--blue); box-shadow: 0 0 0 3px rgba(59,130,246,.1); background: white; }
+.date-input:focus { border-color: #3b82f6; box-shadow: 0 0 0 3px rgba(59,130,246,.1); background: white; }
 .date-separator { color: var(--text-muted); padding-bottom: 10px; }
 .filter-actions { display: flex; gap: 10px; }
 
 /* Buttons */
-.btn-tampilkan { display: inline-flex; align-items: center; gap: 7px; height: 40px; padding: 0 20px; background: var(--blue); color: #ffffff; border: none; border-radius: var(--radius-sm); font-family: var(--font); font-size: 13px; font-weight: 600; cursor: pointer; box-shadow: 0 2px 8px rgba(59,130,246,.3); transition: background .2s, transform .15s; }
+.btn-tampilkan { display: inline-flex; align-items: center; gap: 7px; height: 40px; padding: 0 20px; background: #3b82f6; color: #ffffff; border: none; border-radius: var(--radius-sm); font-family: var(--font); font-size: 13px; font-weight: 600; cursor: pointer; box-shadow: 0 2px 8px rgba(59,130,246,.3); transition: background .2s, transform .15s; }
 .btn-tampilkan:hover { background: #2563eb; transform: translateY(-1px); }
 .btn-export { display: inline-flex; align-items: center; gap: 7px; height: 40px; padding: 0 20px; border-radius: var(--radius-sm); font-family: var(--font); font-size: 13px; font-weight: 600; text-decoration: none; transition: background .2s, transform .15s; }
 .btn-export:hover { transform: translateY(-1px); }
@@ -449,25 +456,25 @@ const formatTimeOnly = (val) => new Date(val).toLocaleTimeString('id-ID', {
 .summary-card-bg { position: absolute; inset: 0; background: radial-gradient(ellipse at top right,rgba(255,255,255,.7) 0%,transparent 60%); pointer-events: none; }
 .summary-card-content { position: relative; display: flex; align-items: flex-start; gap: 14px; }
 .summary-icon { width: 44px; height: 44px; border-radius: 12px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
-.summary-icon--blue   { background: rgba(59,130,246,.15); color: var(--blue); }
-.summary-icon--orange { background: rgba(249,115,22,.15); color: var(--orange); }
-.summary-icon--green  { background: rgba(16,185,129,.15); color: var(--green); }
-.summary-icon--purple { background: rgba(139,92,246,.15); color: var(--purple); }
+.summary-icon--blue   { background: rgba(59,130,246,.15); color: #3b82f6; }
+.summary-icon--orange { background: rgba(249,115,22,.15); color: #f97316; }
+.summary-icon--green  { background: rgba(16,185,129,.15); color: #10b981; }
+.summary-icon--purple { background: rgba(139,92,246,.15); color: #8b5cf6; }
 .summary-info { display: flex; flex-direction: column; }
 .summary-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.6px; color: var(--text-secondary); margin-bottom: 4px; }
 .summary-value { font-size: 28px; font-weight: 800; color: var(--text-primary); line-height: 1.1; letter-spacing: -0.5px; }
 .summary-value--sm { font-size: 18px; }
 .summary-unit { font-size: 11px; color: var(--text-muted); margin-top: 4px; font-weight: 500; }
 .text-green { color: #065f46 !important; }
-.text-red   { color: var(--red) !important; }
+.text-red   { color: #ef4444 !important; }
 
 /* Profit Bar */
 .profit-bar-card { background: var(--surface); border-radius: var(--radius); border: 1px solid var(--border); padding: 20px 24px; box-shadow: var(--shadow-sm); }
 .profit-bar-label { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; font-size: 13px; font-weight: 600; color: var(--text-secondary); }
 .profit-bar-legend { display: flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 500; }
 .legend-dot { display: inline-block; width: 10px; height: 10px; border-radius: 50%; }
-.legend-dot--modal  { background: var(--orange); }
-.legend-dot--profit { background: var(--green); }
+.legend-dot--modal  { background: #f97316; }
+.legend-dot--profit { background: #10b981; }
 .ms-3 { margin-left: 12px; }
 .profit-bar { display: flex; height: 36px; border-radius: 10px; overflow: hidden; gap: 2px; }
 .profit-bar-modal  { background: linear-gradient(90deg,#fb923c,#f97316); display: flex; align-items: center; justify-content: center; color: white; font-size: 12px; font-weight: 700; min-width: 40px; transition: width .6s ease; }
@@ -479,11 +486,11 @@ const formatTimeOnly = (val) => new Date(val).toLocaleTimeString('id-ID', {
 .table-header-left { display: flex; flex-direction: column; gap: 4px; }
 .table-card-title { font-size: 15px; font-weight: 700; color: var(--text-primary); margin: 0; }
 .table-card-count { display: flex; align-items: center; gap: 6px; font-size: 12px; color: var(--text-muted); font-weight: 500; }
-.count-dot { width: 6px; height: 6px; background: var(--green); border-radius: 50%; }
+.count-dot { width: 6px; height: 6px; background: #10b981; border-radius: 50%; }
 .search-wrapper { position: relative; }
 .search-icon { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: var(--text-muted); pointer-events: none; }
 .search-input { height: 38px; width: 260px; padding: 0 12px 0 36px; border: 1.5px solid var(--border); border-radius: 20px; font-family: var(--font); font-size: 13px; color: var(--text-primary); background: #fafbfc; outline: none; transition: border-color .2s, box-shadow .2s; }
-.search-input:focus { border-color: var(--blue); box-shadow: 0 0 0 3px rgba(59,130,246,.1); background: white; }
+.search-input:focus { border-color: #3b82f6; box-shadow: 0 0 0 3px rgba(59,130,246,.1); background: white; }
 .search-input::placeholder { color: var(--text-muted); }
 .table-wrapper { overflow-x: auto; }
 .profit-table { width: 100%; border-collapse: collapse; font-size: 13px; }
@@ -498,17 +505,17 @@ const formatTimeOnly = (val) => new Date(val).toLocaleTimeString('id-ID', {
 .profit-table td { padding: 13px 14px; vertical-align: middle; }
 .profit-table td.text-center { text-align: center; }
 .profit-table td.text-right  { text-align: right; }
-.row-no { display: inline-flex; align-items: center; justify-content: center; width: 24px; height: 24px; background: var(--blue-light); color: var(--blue); border-radius: 6px; font-size: 11px; font-weight: 700; }
-.trx-no-badge { display: inline-block; padding: 4px 10px; background: var(--blue-light); color: var(--blue); border-radius: 20px; font-size: 11.5px; font-weight: 600; white-space: nowrap; }
+.row-no { display: inline-flex; align-items: center; justify-content: center; width: 24px; height: 24px; background: #eff6ff; color: #3b82f6; border-radius: 6px; font-size: 11px; font-weight: 700; }
+.trx-no-badge { display: inline-block; padding: 4px 10px; background: #eff6ff; color: #3b82f6; border-radius: 20px; font-size: 11.5px; font-weight: 600; white-space: nowrap; }
 .waktu-cell { display: flex; flex-direction: column; gap: 1px; }
 .waktu-date { font-size: 12px; font-weight: 600; color: var(--text-secondary); }
 .waktu-time { font-size: 11px; color: var(--text-muted); }
-.amount-omzet  { font-weight: 700; color: var(--blue); }
-.amount-modal  { font-weight: 600; color: var(--orange); }
+.amount-omzet  { font-weight: 700; color: #3b82f6; }
+.amount-modal  { font-weight: 600; color: #f97316; }
 .amount-profit { font-weight: 700; color: #065f46; }
-.amount-loss   { font-weight: 700; color: var(--red); }
+.amount-loss   { font-weight: 700; color: #ef4444; }
 .margin-badge { display: inline-block; padding: 4px 10px; border-radius: 20px; font-size: 11px; font-weight: 700; }
-.margin-good { background: var(--green-light); color: #065f46; }
+.margin-good { background: #f0fdf4; color: #065f46; }
 .margin-ok   { background: #fffbeb; color: #92400e; }
 .margin-low  { background: #fef2f2; color: #991b1b; }
 .empty-state { padding: 56px 0 !important; text-align: center; }

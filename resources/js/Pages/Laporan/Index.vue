@@ -7,7 +7,7 @@
             <div class="page-header mb-8">
                 <div class="header-content">
                     <div class="header-text">
-                        <h1 class="page-title">Laporan Transaksi</h1>
+                        <h1 class="page-title">💲  Laporan Transaksi</h1>
                         <p class="page-subtitle">Analisis penjualan dan performa toko</p>
                     </div>
                     <div class="header-badge">
@@ -298,7 +298,11 @@ const formatTimeOnly = (val) => new Date(val).toLocaleTimeString('id-ID', {
 <style scoped>
 @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
 
-:root {
+/* =============================================
+   SEMUA VARIABLE DIPINDAH KE .laporan-container
+   bukan :root agar tidak bocor ke parent layout
+   ============================================= */
+.laporan-container {
     --font: 'Plus Jakarta Sans', sans-serif;
     --radius: 14px;
     --radius-sm: 8px;
@@ -326,9 +330,7 @@ const formatTimeOnly = (val) => new Date(val).toLocaleTimeString('id-ID', {
     --shadow-sm: 0 1px 3px rgba(0,0,0,.05), 0 1px 2px rgba(0,0,0,.04);
     --shadow: 0 4px 12px rgba(0,0,0,.06), 0 2px 6px rgba(0,0,0,.04);
     --shadow-md: 0 8px 24px rgba(0,0,0,.08), 0 4px 12px rgba(0,0,0,.05);
-}
 
-.laporan-container {
     font-family: var(--font);
     padding: 32px;
     background: var(--bg);
@@ -363,7 +365,7 @@ const formatTimeOnly = (val) => new Date(val).toLocaleTimeString('id-ID', {
 .filter-actions { display: flex; gap: 10px; padding-bottom: 0; }
 
 /* Buttons */
-.btn-tampilkan { display: inline-flex; align-items: center; gap: 7px; height: 40px; padding: 0 20px; background: var(--blue); color: #ffffff; border: none; border-radius: var(--radius-sm); font-family: var(--font); font-size: 13px; font-weight: 600; cursor: pointer; box-shadow: 0 2px 8px rgba(59,130,246,.35); transition: background .2s, transform .15s; }
+.btn-tampilkan { display: inline-flex; align-items: center; gap: 7px; height: 40px; padding: 0 20px; background: #3b82f6; color: #ffffff; border: none; border-radius: var(--radius-sm); font-family: var(--font); font-size: 13px; font-weight: 600; cursor: pointer; box-shadow: 0 2px 8px rgba(59,130,246,.35); transition: background .2s, transform .15s; }
 .btn-tampilkan:hover { background: #2563eb; transform: translateY(-1px); }
 
 .btn-export { display: inline-flex; align-items: center; gap: 7px; height: 40px; padding: 0 20px; border-radius: var(--radius-sm); font-family: var(--font); font-size: 13px; font-weight: 600; text-decoration: none; transition: background .2s, transform .15s; }
@@ -383,18 +385,18 @@ const formatTimeOnly = (val) => new Date(val).toLocaleTimeString('id-ID', {
 .summary-card-bg { position: absolute; inset: 0; background: radial-gradient(ellipse at top right, rgba(255,255,255,0.7) 0%, transparent 60%); pointer-events: none; }
 .summary-card-content { position: relative; display: flex; align-items: flex-start; gap: 14px; }
 .summary-icon { width: 44px; height: 44px; border-radius: 12px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
-.summary-icon--blue   { background: rgba(59,130,246,.15); color: var(--blue); }
-.summary-icon--green  { background: rgba(16,185,129,.15); color: var(--green); }
-.summary-icon--purple { background: rgba(139,92,246,.15); color: var(--purple); }
+.summary-icon--blue   { background: rgba(59,130,246,.15); color: #3b82f6; }
+.summary-icon--green  { background: rgba(16,185,129,.15); color: #10b981; }
+.summary-icon--purple { background: rgba(139,92,246,.15); color: #8b5cf6; }
 .summary-info { display: flex; flex-direction: column; }
 .summary-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.6px; color: var(--text-secondary); margin-bottom: 4px; }
 .summary-value { font-size: 28px; font-weight: 800; color: var(--text-primary); line-height: 1.1; letter-spacing: -0.5px; }
 .summary-value--sm { font-size: 20px; }
 .summary-unit { font-size: 11px; color: var(--text-muted); margin-top: 4px; font-weight: 500; }
 .summary-trend { position: absolute; bottom: 10px; right: 14px; opacity: 0.5; }
-.summary-card--blue .summary-trend   { color: var(--blue); }
-.summary-card--green .summary-trend  { color: var(--green); }
-.summary-card--purple .summary-trend { color: var(--purple); }
+.summary-card--blue .summary-trend   { color: #3b82f6; }
+.summary-card--green .summary-trend  { color: #10b981; }
+.summary-card--purple .summary-trend { color: #8b5cf6; }
 
 /* Table Card */
 .table-card { background: var(--surface); border-radius: var(--radius); border: 1px solid var(--border); box-shadow: var(--shadow-sm); overflow: hidden; }
@@ -402,12 +404,12 @@ const formatTimeOnly = (val) => new Date(val).toLocaleTimeString('id-ID', {
 .table-header-left { display: flex; flex-direction: column; gap: 4px; }
 .table-card-title { font-size: 15px; font-weight: 700; color: var(--text-primary); margin: 0; }
 .table-card-count { display: flex; align-items: center; gap: 6px; font-size: 12px; color: var(--text-muted); font-weight: 500; }
-.count-dot { width: 6px; height: 6px; background: var(--green); border-radius: 50%; }
+.count-dot { width: 6px; height: 6px; background: #10b981; border-radius: 50%; }
 
 .search-wrapper { position: relative; }
 .search-icon { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: var(--text-muted); pointer-events: none; }
 .search-input { height: 38px; width: 280px; padding: 0 12px 0 36px; border: 1.5px solid var(--border); border-radius: 20px; font-family: var(--font); font-size: 13px; color: var(--text-primary); background: #fafbfc; outline: none; transition: border-color .2s, box-shadow .2s; }
-.search-input:focus { border-color: var(--blue); box-shadow: 0 0 0 3px rgba(59,130,246,.1); background: white; }
+.search-input:focus { border-color: #3b82f6; box-shadow: 0 0 0 3px rgba(59,130,246,.1); background: white; }
 .search-input::placeholder { color: var(--text-muted); }
 
 .table-wrapper { overflow-x: auto; }
@@ -424,21 +426,21 @@ const formatTimeOnly = (val) => new Date(val).toLocaleTimeString('id-ID', {
 .trx-table td.text-center { text-align: center; }
 .trx-table td.text-right  { text-align: right; }
 
-.row-no { display: inline-flex; align-items: center; justify-content: center; width: 24px; height: 24px; background: var(--blue-light); color: var(--blue); border-radius: 6px; font-size: 11px; font-weight: 700; }
-.trx-no-badge { display: inline-block; padding: 4px 10px; background: var(--blue-light); color: var(--blue); border-radius: 20px; font-size: 11.5px; font-weight: 600; white-space: nowrap; letter-spacing: 0.2px; }
+.row-no { display: inline-flex; align-items: center; justify-content: center; width: 24px; height: 24px; background: #eff6ff; color: #3b82f6; border-radius: 6px; font-size: 11px; font-weight: 700; }
+.trx-no-badge { display: inline-block; padding: 4px 10px; background: #eff6ff; color: #3b82f6; border-radius: 20px; font-size: 11.5px; font-weight: 600; white-space: nowrap; letter-spacing: 0.2px; }
 .user-cell { display: flex; align-items: center; gap: 8px; }
-.user-avatar { width: 28px; height: 28px; background: linear-gradient(135deg, var(--blue), #6366f1); color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 700; flex-shrink: 0; }
+.user-avatar { width: 28px; height: 28px; background: linear-gradient(135deg, #3b82f6, #6366f1); color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 700; flex-shrink: 0; }
 .user-name { font-weight: 600; color: var(--text-primary); }
-.member-badge { display: inline-block; padding: 3px 9px; background: var(--amber-light); color: #92400e; border-radius: 20px; font-size: 11.5px; font-weight: 600; }
+.member-badge { display: inline-block; padding: 3px 9px; background: #fffbeb; color: #92400e; border-radius: 20px; font-size: 11.5px; font-weight: 600; }
 .text-muted-cell { color: var(--text-muted); }
-.items-badge { display: inline-block; padding: 3px 9px; background: var(--border-light); color: var(--text-secondary); border-radius: 20px; font-size: 11.5px; font-weight: 600; }
+.items-badge { display: inline-block; padding: 3px 9px; background: #f0f3f8; color: var(--text-secondary); border-radius: 20px; font-size: 11.5px; font-weight: 600; }
 .amount-total   { font-weight: 700; color: #065f46; }
 .amount-bayar   { color: var(--text-secondary); font-weight: 500; }
-.amount-kembali { font-weight: 600; color: var(--blue); }
+.amount-kembali { font-weight: 600; color: #3b82f6; }
 .metode-badge { display: inline-block; padding: 4px 10px; border-radius: 20px; font-size: 10.5px; font-weight: 700; letter-spacing: 0.4px; }
-.metode-tunai    { background: var(--green-light); color: #065f46; }
-.metode-transfer { background: var(--blue-light); color: #1e40af; }
-.metode-qris     { background: var(--amber-light); color: #92400e; }
+.metode-tunai    { background: #f0fdf4; color: #065f46; }
+.metode-transfer { background: #eff6ff; color: #1e40af; }
+.metode-qris     { background: #fffbeb; color: #92400e; }
 .waktu-cell { display: flex; flex-direction: column; gap: 1px; }
 .waktu-date { font-size: 12px; font-weight: 600; color: var(--text-secondary); }
 .waktu-time { font-size: 11px; color: var(--text-muted); }

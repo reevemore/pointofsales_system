@@ -17,7 +17,7 @@
 
             <div class="left-content">
                 <div class="left-badge">Point of Sale System</div>
-                <h2 class="left-title">Kelola toko Anda<br>lebih mudah &amp; cepat</h2>
+                <h2 class="left-title">Kelola toko Anda dengan<br>Aplikasi kami</h2>
                 <p class="left-desc">Platform manajemen penjualan lengkap untuk bisnis Anda. Pantau pendapatan, stok, dan transaksi dalam satu tempat.</p>
 
                 <div class="stat-row">
@@ -51,7 +51,7 @@
                 </div>
             </div>
 
-            <div class="left-footer">© 2025 POSSYS · All rights reserved</div>
+            <div class="left-footer">© 2026 POSHEESH · All rights reserved</div>
         </div>
 
         <!-- Right panel / form -->

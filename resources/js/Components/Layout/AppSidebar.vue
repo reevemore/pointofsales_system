@@ -120,15 +120,7 @@
                             </Link>
                         </div>
 
-                        <div class="menu-item pt-5" v-show="!props.collapsed">
-                            <div class="menu-content">
-                                <span class="menu-heading fw-bold text-uppercase fs-8 ls-1"
-                                    style="color:#4b5675;">Laporan & Setting</span>
-                            </div>
-                        </div>
-
-                        <!-- Laporan -->
-<div class="menu-item" :title="props.collapsed ? 'Laporan' : ''">
+                        <div class="menu-item" :title="props.collapsed ? 'Laporan' : ''">
     <Link :href="route('laporan.index')" class="menu-link"
         :class="{ active: $page.component === 'Laporan/Index' }">
         <span class="menu-icon">
@@ -152,6 +144,13 @@
         <span class="menu-title" v-show="!props.collapsed">Laporan Profit</span>
     </Link>
 </div>
+
+                        <div class="menu-item pt-5" v-show="!props.collapsed">
+                            <div class="menu-content">
+                                <span class="menu-heading fw-bold text-uppercase fs-8 ls-1"
+                                    style="color:#4b5675;">Setting & Permission</span>
+                            </div>
+                        </div>
 
                         <!-- Users -->
                         <div class="menu-item" :title="props.collapsed ? 'Users' : ''">
