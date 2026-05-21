@@ -2,32 +2,41 @@
     <!-- Overlay mobile -->
     <div v-if="isMobile && !props.collapsed"
         @click="emit('update:collapsed', true)"
-        style="position:fixed;inset:0;background:rgba(0,0,0,0.4);z-index:119;" />
+        style="position:fixed;inset:0;background:rgba(0,0,0,0.4);z-index:109;" />
 
-    <div id="kt_app_sidebar"
-        :class="['app-sidebar flex-column', props.collapsed ? 'sidebar-collapsed' : '']">
+    <div id="kt_app_sidebar" class="app-sidebar flex-column"
+        :class="props.collapsed ? 'sidebar-collapsed' : ''">
 
-        <!-- Logo + Toggle — setinggi header (70px) -->
-        <div class="app-sidebar-logo d-flex align-items-center justify-content-between px-4"
+        <!-- Logo -->
+        <div class="app-sidebar-logo px-6 d-flex align-items-center"
             id="kt_app_sidebar_logo">
-            <a href="/" class="d-flex align-items-center gap-2">
-                <img alt="Logo" src="/metronic/media/logos/keenthemes-dark.svg"
-                    class="h-25px" v-show="!props.collapsed" />
-                <img alt="Logo" src="/metronic/media/logos/default-small.svg"
-                    class="h-25px" v-show="props.collapsed" />
+            <a href="/">
+                <!-- Logo full (expanded) -->
+                <img v-show="!props.collapsed"
+                    alt="Logo"
+                    src="/metronic/media/logos/keenthemes-dark.svg"
+                    class="h-25px" />
+                <!-- Logo mini (collapsed) -->
+                <img v-show="props.collapsed"
+                    alt="Logo"
+                    src="/metronic/media/logos/default-small-dark.svg"
+                    class="h-20px" />
             </a>
-            <button @click="emit('update:collapsed', !props.collapsed)"
-                class="btn btn-icon btn-sm btn-active-color-primary sidebar-toggle-btn">
-                <i :class="['ki-duotone fs-3', props.collapsed ? 'ki-arrow-right' : 'ki-arrow-left']">
-                    <span class="path1"></span><span class="path2"></span>
-                </i>
-            </button>
         </div>
 
         <!-- Menu -->
         <div class="app-sidebar-menu overflow-hidden flex-column-fluid">
-            <div class="app-sidebar-wrapper hover-scroll-overlay-y my-5 px-2">
-                <div class="menu menu-column menu-rounded menu-sub-indention">
+            <div id="kt_app_sidebar_menu_wrapper"
+                class="app-sidebar-wrapper hover-scroll-overlay-y my-2"
+                data-kt-scroll="true"
+                data-kt-scroll-activate="true"
+                data-kt-scroll-height="auto"
+                data-kt-scroll-wrappers="#kt_app_sidebar_menu"
+                data-kt-scroll-offset="5px">
+
+                <div id="kt_app_sidebar_menu"
+                    class="menu menu-column menu-rounded menu-sub-indention px-3"
+                    data-kt-menu="true">
 
                     <!-- Dashboard -->
                     <div class="menu-item" :title="props.collapsed ? 'Dashboard' : ''">
@@ -42,8 +51,8 @@
                         </Link>
                     </div>
 
-                    <!-- Point of Sale -->
-                    <div class="menu-item" :title="props.collapsed ? 'Point Of Sales' : ''">
+                    <!-- Transaksi -->
+                    <div class="menu-item" :title="props.collapsed ? 'Transaksi' : ''">
                         <Link :href="route('pos.index')" class="menu-link"
                             :class="{ active: $page.component === 'POS/Index' }">
                             <span class="menu-icon">
@@ -72,10 +81,10 @@
                     <!-- ADMIN ONLY -->
                     <template v-if="isAdmin">
 
+                        <!-- Section: Master Data -->
                         <div class="menu-item pt-5" v-show="!props.collapsed">
                             <div class="menu-content">
-                                <span class="menu-heading fw-bold text-uppercase fs-8 ls-1"
-                                    style="color:#4b5675;">Master Data</span>
+                                <span class="menu-heading fw-bold text-uppercase fs-8 ls-1">Master Data</span>
                             </div>
                         </div>
 
@@ -120,35 +129,43 @@
                             </Link>
                         </div>
 
-                        <div class="menu-item" :title="props.collapsed ? 'Laporan' : ''">
-    <Link :href="route('laporan.index')" class="menu-link"
-        :class="{ active: $page.component === 'Laporan/Index' }">
-        <span class="menu-icon">
-            <i class="ki-duotone ki-chart-line-up fs-2">
-                <span class="path1"></span><span class="path2"></span>
-            </i>
-        </span>
-        <span class="menu-title" v-show="!props.collapsed">Laporan</span>
-    </Link>
-</div>
-
-<!-- Laporan Profit -->
-<div class="menu-item" :title="props.collapsed ? 'Laporan Profit' : ''">
-    <Link :href="route('laporan.profit')" class="menu-link"
-        :class="{ active: $page.component === 'Laporan/Profit' }">
-        <span class="menu-icon">
-            <i class="ki-duotone ki-graph-up fs-2">
-                <span class="path1"></span><span class="path2"></span>
-            </i>
-        </span>
-        <span class="menu-title" v-show="!props.collapsed">Laporan Profit</span>
-    </Link>
-</div>
-
+                        <!-- Section: Laporan -->
                         <div class="menu-item pt-5" v-show="!props.collapsed">
                             <div class="menu-content">
-                                <span class="menu-heading fw-bold text-uppercase fs-8 ls-1"
-                                    style="color:#4b5675;">Setting & Permission</span>
+                                <span class="menu-heading fw-bold text-uppercase fs-8 ls-1">Laporan</span>
+                            </div>
+                        </div>
+
+                        <!-- Laporan -->
+                        <div class="menu-item" :title="props.collapsed ? 'Laporan' : ''">
+                            <Link :href="route('laporan.index')" class="menu-link"
+                                :class="{ active: $page.component === 'Laporan/Index' }">
+                                <span class="menu-icon">
+                                    <i class="ki-duotone ki-chart-line-up fs-2">
+                                        <span class="path1"></span><span class="path2"></span>
+                                    </i>
+                                </span>
+                                <span class="menu-title" v-show="!props.collapsed">Laporan</span>
+                            </Link>
+                        </div>
+
+                        <!-- Laporan Profit -->
+                        <div class="menu-item" :title="props.collapsed ? 'Laporan Profit' : ''">
+                            <Link :href="route('laporan.profit')" class="menu-link"
+                                :class="{ active: $page.component === 'Laporan/Profit' }">
+                                <span class="menu-icon">
+                                    <i class="ki-duotone ki-graph-up fs-2">
+                                        <span class="path1"></span><span class="path2"></span>
+                                    </i>
+                                </span>
+                                <span class="menu-title" v-show="!props.collapsed">Laporan Profit</span>
+                            </Link>
+                        </div>
+
+                        <!-- Section: Setting -->
+                        <div class="menu-item pt-5" v-show="!props.collapsed">
+                            <div class="menu-content">
+                                <span class="menu-heading fw-bold text-uppercase fs-8 ls-1">Setting & Permission</span>
                             </div>
                         </div>
 
@@ -187,13 +204,13 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted, onUnmounted } from 'vue'
+import { ref, onMounted, onUnmounted, computed } from 'vue'
 import { Link, usePage } from '@inertiajs/vue3'
 
 const props = defineProps({ collapsed: Boolean })
 const emit = defineEmits(['update:collapsed'])
 
-const page    = usePage()
+const page = usePage()
 const isAdmin = computed(() => page.props.auth?.role === 'admin')
 const isMobile = ref(window.innerWidth < 992)
 
@@ -203,7 +220,6 @@ onUnmounted(() => window.removeEventListener('resize', onResize))
 </script>
 
 <style scoped>
-/* Ukuran & transisi — posisi dihandle AuthenticatedLayout */
 #kt_app_sidebar {
     width: 265px;
     background-color: #1e1e2d;
@@ -214,24 +230,14 @@ onUnmounted(() => window.removeEventListener('resize', onResize))
     width: 70px;
 }
 
-/* Logo area — setinggi header supaya sejajar */
 .app-sidebar-logo {
     height: 70px;
     flex-shrink: 0;
     border-bottom: 1px solid #2d2d43;
 }
 
-.sidebar-toggle-btn {
+.menu-heading {
     color: #4b5675;
-    width: 28px;
-    height: 28px;
-    border: 1px solid #2d2d43;
-    border-radius: 6px;
-    background: #1e1e2d;
-}
-.sidebar-toggle-btn:hover {
-    background: #2d2d43;
-    color: #fff;
 }
 
 .menu-link {

@@ -4,7 +4,10 @@
         <div id="kt_app_page" class="app-page flex-column flex-column-fluid">
 
             <!-- HEADER -->
-            <AppHeader />
+            <AppHeader
+                :collapsed="collapsed"
+                @toggle-sidebar="toggleSidebar"
+            />
 
             <!-- WRAPPER -->
             <div id="kt_app_wrapper" class="app-wrapper flex-row flex-row-fluid">
@@ -38,8 +41,12 @@ import AppFooter from '@/Components/Layout/AppFooter.vue'
 const collapsed = ref(localStorage.getItem('sidebar_collapsed') === 'true')
 const sidebarWidth = computed(() => collapsed.value ? '70px' : '265px')
 
+const toggleSidebar = () => {
+    collapsed.value = !collapsed.value
+}
+
 watch(collapsed, (val) => {
-    localStorage.setItem('sidebar_collapsed', val)
+    localStorage.setItem('sidebar_collapsed', String(val))
 })
 </script>
 
@@ -56,7 +63,7 @@ body {
     padding: 0 !important;
 }
 
-/* SIDEBAR: fixed, full height, z-index tinggi */
+/* SIDEBAR: fixed, full height */
 #kt_app_sidebar {
     position: fixed !important;
     top: 0 !important;
@@ -65,7 +72,7 @@ body {
     z-index: 200;
 }
 
-/* HEADER: fixed, mulai dari kanan sidebar — ikut CSS variable --sidebar-width */
+/* HEADER: fixed, mulai dari kanan sidebar */
 #kt_app_header {
     position: fixed !important;
     top: 0;
@@ -85,7 +92,7 @@ body {
     min-height: 100vh;
 }
 
-/* MAIN CONTENT: ikut lebar sidebar via CSS variable */
+/* MAIN CONTENT */
 #kt_app_main {
     min-width: 0;
     overflow-x: hidden;
@@ -94,6 +101,7 @@ body {
     transition: margin-left 0.3s ease;
 }
 
+/* MOBILE */
 @media (max-width: 991px) {
     #kt_app_header {
         left: 0 !important;
