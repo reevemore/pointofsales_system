@@ -5,6 +5,7 @@
             <!-- HEADER -->
             <AppHeader
                 :collapsed="collapsed"
+                :style="{ left: headerLeft }"
                 @toggle-sidebar="toggleSidebar"
             />
 
@@ -41,11 +42,19 @@ import AppHeader  from '@/Components/Layout/AppHeader.vue'
 import AppSidebar from '@/Components/Layout/AppSidebar.vue'
 import AppFooter  from '@/Components/Layout/AppFooter.vue'
 
+// Default false (expanded) — clear localStorage lama jika perlu
 const collapsed = ref(localStorage.getItem('sidebar_collapsed') === 'true')
 
+const isMobile = () => typeof window !== 'undefined' && window.innerWidth < 992
+
 const mainMargin = computed(() => {
-    // On mobile, no left margin (sidebar overlays)
-    if (typeof window !== 'undefined' && window.innerWidth < 992) return '0px'
+    if (isMobile()) return '0px'
+    return collapsed.value ? '70px' : '265px'
+})
+
+// Header left reaktif — agar toggle button tidak tertutup sidebar
+const headerLeft = computed(() => {
+    if (isMobile()) return '0px'
     return collapsed.value ? '70px' : '265px'
 })
 
@@ -82,16 +91,18 @@ body {
     min-height: 100vh;
 }
 
-/* HEADER — fixed, starts after sidebar */
+/* HEADER — fixed, left reaktif via :style binding dari Vue */
 #kt_app_header {
     position: fixed !important;
     top: 0;
     right: 0;
+    /* left diatur via :style binding di template agar reaktif */
     height: 70px;
     z-index: 150;
     background: #ffffff;
     border-bottom: 1px solid #f1f1f4;
     box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+    transition: left 0.3s ease;
 }
 
 /* WRAPPER */
@@ -119,9 +130,11 @@ body {
 @media (max-width: 991px) {
     #kt_app_header {
         left: 0 !important;
+        transition: none;
     }
     #kt_app_main {
         margin-left: 0 !important;
     }
 }
+
 </style>

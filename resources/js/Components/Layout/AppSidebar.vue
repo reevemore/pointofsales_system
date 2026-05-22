@@ -356,11 +356,11 @@ const isActive = (components) => {
     </div>
 </template>
 
-<style scoped>
+<style>
 /* =====================================================
-   APP SIDEBAR — Complete Styles
+   APP SIDEBAR — Complete Styles (global, override Metronic)
    ===================================================== */
-.app-sidebar {
+#kt_app_sidebar.app-sidebar {
     display: flex;
     flex-direction: column;
     width: 265px;
@@ -375,13 +375,13 @@ const isActive = (components) => {
     z-index: 200;
 }
 
-.app-sidebar.sidebar-collapsed {
+#kt_app_sidebar.app-sidebar.sidebar-collapsed {
     width: 70px;
     min-width: 70px;
 }
 
 /* Logo area */
-.app-sidebar-logo {
+#kt_app_sidebar .app-sidebar-logo {
     padding: 0 1.5rem;
     height: 70px;
     min-height: 70px;
@@ -390,90 +390,101 @@ const isActive = (components) => {
 }
 
 /* Store info badge */
-.sidebar-store-info {
+#kt_app_sidebar .sidebar-store-info {
     padding: 0.75rem 1rem;
     background: rgba(255, 255, 255, 0.07);
     margin-top: 0.5rem;
 }
 
 /* Menu wrapper */
-.app-sidebar-menu {
+#kt_app_sidebar .app-sidebar-menu {
     flex: 1;
     overflow: hidden;
 }
 
-.app-sidebar-wrapper {
+#kt_app_sidebar .app-sidebar-wrapper {
     height: 100%;
     overflow-y: auto;
     scrollbar-width: thin;
     scrollbar-color: rgba(255,255,255,0.1) transparent;
 }
 
-.app-sidebar-wrapper::-webkit-scrollbar {
+#kt_app_sidebar .app-sidebar-wrapper::-webkit-scrollbar {
     width: 4px;
 }
-.app-sidebar-wrapper::-webkit-scrollbar-thumb {
+#kt_app_sidebar .app-sidebar-wrapper::-webkit-scrollbar-thumb {
     background: rgba(255,255,255,0.15);
     border-radius: 4px;
 }
 
-/* Menu items */
-.menu-link {
-    display: flex;
-    align-items: center;
-    padding: 0.65rem 0.75rem;
-    border-radius: 0.475rem;
+/* =====================================================
+   MENU LINK — Override Metronic dengan !important
+   ===================================================== */
+#kt_app_sidebar .menu-link {
+    display: flex !important;
+    align-items: center !important;
+    padding: 0.65rem 0.75rem !important;
+    border-radius: 0.475rem !important;
     color: #9899ac !important;
     text-decoration: none !important;
-    transition: background-color 0.2s, color 0.2s;
-    white-space: nowrap;
-    overflow: hidden;
+    transition: background-color 0.2s, color 0.2s !important;
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    background-color: transparent !important;
 }
 
-.menu-link:hover {
-    background-color: rgba(255, 255, 255, 0.07);
+#kt_app_sidebar .menu-link:hover {
+    background-color: rgba(255, 255, 255, 0.07) !important;
     color: #ffffff !important;
 }
 
-.menu-link.active {
-    background-color: rgba(255, 255, 255, 0.1);
+#kt_app_sidebar .menu-link.active {
+    background-color: rgba(255, 255, 255, 0.1) !important;
     color: #ffffff !important;
 }
 
-.menu-icon {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 2rem;
-    min-width: 2rem;
-    margin-right: 0.75rem;
-    color: inherit;
+/* Icon warna ikut parent */
+#kt_app_sidebar .menu-link .menu-icon,
+#kt_app_sidebar .menu-link .menu-icon i,
+#kt_app_sidebar .menu-link .menu-icon svg {
+    color: inherit !important;
 }
 
-.sidebar-collapsed .menu-icon {
-    margin-right: 0;
+#kt_app_sidebar .menu-icon {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    width: 2rem !important;
+    min-width: 2rem !important;
+    margin-right: 0.75rem !important;
+    color: inherit !important;
 }
 
-.menu-title {
-    font-size: 0.925rem;
-    font-weight: 500;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
+#kt_app_sidebar.sidebar-collapsed .menu-icon {
+    margin-right: 0 !important;
+}
+
+#kt_app_sidebar .menu-title {
+    font-size: 0.925rem !important;
+    font-weight: 500 !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    white-space: nowrap !important;
+    color: inherit !important;
 }
 
 /* Section labels */
-.menu-section {
-    font-size: 0.7rem;
-    letter-spacing: 0.08rem;
-    font-weight: 600;
+#kt_app_sidebar .menu-section {
+    font-size: 0.7rem !important;
+    letter-spacing: 0.08rem !important;
+    font-weight: 600 !important;
     color: #4b4b6b !important;
-    display: block;
-    padding: 0 0.75rem;
+    display: block !important;
+    padding: 0 0.75rem !important;
 }
 
 /* Sidebar Footer */
-.app-sidebar-footer {
+#kt_app_sidebar .app-sidebar-footer {
     padding: 1rem 1.5rem;
     border-top: 1px solid rgba(255, 255, 255, 0.08);
     flex-shrink: 0;
@@ -487,20 +498,20 @@ const isActive = (components) => {
     z-index: 109;
 }
 
-/* Collapsed: hide text icon tooltips show */
-.sidebar-collapsed .menu-section {
-    display: none;
+/* Collapsed: hide section labels */
+#kt_app_sidebar.sidebar-collapsed .menu-section {
+    display: none !important;
 }
 
 /* Symbol styles (Metronic-like) */
-.symbol {
+#kt_app_sidebar .symbol {
     display: inline-flex;
     align-items: center;
     justify-content: center;
     flex-shrink: 0;
 }
-.symbol-35px { width: 35px; height: 35px; }
-.symbol-label {
+#kt_app_sidebar .symbol-35px { width: 35px; height: 35px; }
+#kt_app_sidebar .symbol-label {
     width: 100%;
     height: 100%;
     display: flex;
@@ -509,16 +520,16 @@ const isActive = (components) => {
     border-radius: 0.475rem;
     background-color: rgba(255, 255, 255, 0.1);
 }
-.symbol-light-primary .symbol-label { background-color: rgba(13, 110, 253, 0.15); }
-.symbol-light-warning .symbol-label  { background-color: rgba(255, 193, 7, 0.15); }
+#kt_app_sidebar .symbol-light-primary .symbol-label { background-color: rgba(13, 110, 253, 0.15); }
+#kt_app_sidebar .symbol-light-warning .symbol-label  { background-color: rgba(255, 193, 7, 0.15); }
 
 /* Responsive */
 @media (max-width: 991px) {
-    .app-sidebar {
+    #kt_app_sidebar.app-sidebar {
         transform: translateX(-100%);
         transition: transform 0.3s ease, width 0.3s ease;
     }
-    .app-sidebar:not(.sidebar-collapsed) {
+    #kt_app_sidebar.app-sidebar:not(.sidebar-collapsed) {
         transform: translateX(0);
         width: 265px;
     }
