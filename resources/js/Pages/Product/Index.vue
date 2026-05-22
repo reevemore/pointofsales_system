@@ -5,10 +5,18 @@
 
         <div class="d-flex flex-wrap flex-stack mb-6">
             <h3 class="fw-bolder my-2">Master Produk</h3>
-            <Link :href="route('products.create')" class="btn btn-primary">
-                <i class="ki-duotone ki-plus fs-2"></i>
-                Tambah Produk
-            </Link>
+            <div class="d-flex gap-2">
+                <button @click="printSemuaBarcode" class="btn btn-light-success">
+                    <i class="ki-duotone ki-printer fs-2">
+                        <span class="path1"></span><span class="path2"></span><span class="path3"></span>
+                    </i>
+                    Print Semua Barcode
+                </button>
+                <Link :href="route('products.create')" class="btn btn-primary">
+                    <i class="ki-duotone ki-plus fs-2"></i>
+                    Tambah Produk
+                </Link>
+            </div>
         </div>
 
         <div class="card">
@@ -32,7 +40,7 @@
                             <tr class="fw-bold text-muted">
                                 <th>#</th>
                                 <th>Foto</th>
-                                <th>Kode</th>
+                                <th>Kode & Barcode</th>
                                 <th>Nama Produk</th>
                                 <th>Kategori</th>
                                 <th>Harga Jual</th>
@@ -64,9 +72,21 @@
                                     </div>
                                 </td>
                                 <td>
-                                    <span class="badge badge-light-info fw-bold">
+                                    <!-- Kode teks -->
+                                    <span class="badge badge-light-info fw-bold mb-2 d-block" style="width:fit-content">
                                         {{ product.kode_produk }}
                                     </span>
+                                    <!-- Gambar barcode -->
+                                    <svg :id="'barcode-' + product.id" class="d-block"></svg>
+                                    <!-- Tombol print per produk -->
+                                    <button @click="printBarcode(product)"
+                                        class="btn btn-xs btn-light-primary mt-1"
+                                        style="font-size:11px;padding:3px 8px;">
+                                        <i class="ki-duotone ki-printer fs-6 me-1">
+                                            <span class="path1"></span><span class="path2"></span><span class="path3"></span>
+                                        </i>
+                                        Print
+                                    </button>
                                 </td>
                                 <td>
                                     <span class="text-gray-900 fw-bold d-block">{{ product.nama }}</span>
@@ -117,7 +137,7 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed, onMounted, nextTick, watch } from 'vue'
 import { Head, Link, router, usePage } from '@inertiajs/vue3'
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue'
 import { useSwal } from '@/Composables/useSwal'
@@ -142,11 +162,111 @@ const formatRupiah = (val) => {
     }).format(val)
 }
 
-onMounted(() => {
+// Load JsBarcode dari CDN lalu render semua barcode
+function loadJsBarcode() {
+    return new Promise((resolve) => {
+        if (window.JsBarcode) return resolve()
+        const script = document.createElement('script')
+        script.src = 'https://cdn.jsdelivr.net/npm/jsbarcode@3.11.6/dist/JsBarcode.all.min.js'
+        script.onload = resolve
+        document.head.appendChild(script)
+    })
+}
+
+async function renderSemua() {
+    await loadJsBarcode()
+    await nextTick()
+    filteredProducts.value.forEach(product => {
+        const el = document.getElementById('barcode-' + product.id)
+        if (el) {
+            try {
+                JsBarcode(el, product.kode_produk, {
+                    format: 'CODE128',
+                    width: 1.5,
+                    height: 40,
+                    displayValue: false,
+                    margin: 0,
+                })
+            } catch(e) {}
+        }
+    })
+}
+
+onMounted(async () => {
     if (page.props.flash?.success) {
         showSuccess(page.props.flash.success)
     }
+    await renderSemua()
 })
+
+// Re-render barcode setiap kali hasil search berubah
+watch(filteredProducts, async () => {
+    await renderSemua()
+}, { flush: 'post' })
+
+// Print barcode 1 produk
+function printBarcode(product) {
+    const el = document.getElementById('barcode-' + product.id)
+    if (!el) return
+    const svgData = new XMLSerializer().serializeToString(el)
+    const win = window.open('', '_blank', 'width=400,height=300')
+    win.document.write(`
+        <html><head><title>Barcode - ${product.kode_produk}</title>
+        <style>
+            body { font-family: monospace; text-align: center; padding: 20px; }
+            .label { border: 1px dashed #ccc; display: inline-block; padding: 16px 24px; border-radius: 8px; }
+            .nama { font-size: 13px; font-weight: bold; margin-bottom: 6px; }
+            .kode { font-size: 11px; color: #666; margin-top: 4px; }
+            .harga { font-size: 13px; font-weight: bold; color: #333; margin-top: 2px; }
+        </style>
+        </head><body>
+        <div class="label">
+            <div class="nama">${product.nama}</div>
+            ${svgData}
+            <div class="kode">${product.kode_produk}</div>
+            <div class="harga">${formatRupiah(product.harga_jual)}</div>
+        </div>
+        <script>window.onload = function() { window.print(); }<\/script>
+        </body></html>
+    `)
+    win.document.close()
+}
+
+// Print semua barcode sekaligus
+function printSemuaBarcode() {
+    const items = filteredProducts.value.map(product => {
+        const el = document.getElementById('barcode-' + product.id)
+        const svgData = el ? new XMLSerializer().serializeToString(el) : ''
+        return `
+            <div class="label">
+                <div class="nama">${product.nama}</div>
+                ${svgData}
+                <div class="kode">${product.kode_produk}</div>
+                <div class="harga">${formatRupiah(product.harga_jual)}</div>
+            </div>
+        `
+    }).join('')
+
+    const win = window.open('', '_blank', 'width=800,height=600')
+    win.document.write(`
+        <html><head><title>Print Semua Barcode</title>
+        <style>
+            body { font-family: monospace; padding: 16px; }
+            .grid { display: flex; flex-wrap: wrap; gap: 12px; }
+            .label { border: 1px dashed #ccc; display: inline-block; padding: 12px 16px;
+                     border-radius: 8px; text-align: center; page-break-inside: avoid; }
+            .nama { font-size: 12px; font-weight: bold; margin-bottom: 4px; max-width: 150px; }
+            .kode { font-size: 10px; color: #666; margin-top: 2px; }
+            .harga { font-size: 11px; font-weight: bold; margin-top: 2px; }
+            @media print { body { padding: 0; } }
+        </style>
+        </head><body>
+        <div class="grid">${items}</div>
+        <script>window.onload = function() { window.print(); }<\/script>
+        </body></html>
+    `)
+    win.document.close()
+}
 
 const hapus = async (product) => {
     const result = await confirmDelete(product.nama, 'produk')

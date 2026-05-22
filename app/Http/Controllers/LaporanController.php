@@ -21,13 +21,19 @@ class LaporanController extends Controller
             ->whereDate('created_at', '>=', $from)
             ->whereDate('created_at', '<=', $to)
             ->latest()
-            ->get();
+            ->get()
+            ->map(function ($trx) {
+                $trx->total   = (float) $trx->total;
+                $trx->bayar   = (float) ($trx->bayar ?? 0);
+                $trx->kembali = (float) ($trx->kembali ?? 0);
+                return $trx;
+            });
 
         $total = $transactions->sum('total');
 
         return Inertia::render('Laporan/Index', [
             'transactions' => $transactions,
-            'total'        => $total,
+            'total'        => (float) $total,
             'from'         => $from,
             'to'           => $to,
         ]);
@@ -42,9 +48,15 @@ class LaporanController extends Controller
             ->whereDate('created_at', '>=', $from)
             ->whereDate('created_at', '<=', $to)
             ->latest()
-            ->get();
+            ->get()
+            ->map(function ($trx) {
+                $trx->total   = (float) $trx->total;
+                $trx->bayar   = (float) ($trx->bayar ?? 0);
+                $trx->kembali = (float) ($trx->kembali ?? 0);
+                return $trx;
+            });
 
-        $total = $transactions->sum('total');
+        $total = (float) $transactions->sum('total');
 
         $pdf = Pdf::loadView('laporan.pdf', compact('transactions', 'total', 'from', 'to'))
             ->setPaper('a4', 'landscape');

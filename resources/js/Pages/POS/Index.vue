@@ -25,9 +25,10 @@
                     <div class="card-body pt-4">
 
                         <!--begin::Input barcode-->
-                        <div class="d-flex gap-3 align-items-center mb-5">
+                        <div class="d-flex gap-3 align-items-center mb-3">
                             <div class="position-relative flex-grow-1">
-                                <i class="ki-duotone ki-scan-barcode fs-2 position-absolute translate-middle-y top-50 ms-4 text-gray-400">
+                                <i class="ki-duotone ki-scan-barcode fs-2 position-absolute translate-middle-y top-50 ms-4"
+                                    :class="scannerAktif ? 'text-success' : 'text-gray-400'">
                                     <span class="path1"></span><span class="path2"></span>
                                     <span class="path3"></span><span class="path4"></span>
                                     <span class="path5"></span><span class="path6"></span>
@@ -37,9 +38,12 @@
                                     ref="barcodeInput"
                                     v-model="kodeInput"
                                     @keyup.enter="cariProduk"
+                                    @focus="scannerAktif = true"
+                                    @blur="scannerAktif = false"
                                     type="text"
                                     class="form-control form-control-solid form-control-lg ps-14"
-                                    placeholder="ketik kode (contoh: PRD0001)..."
+                                    :class="scannerAktif ? 'border border-success' : ''"
+                                    :placeholder="scannerAktif ? 'Siap scan — arahkan HP ke barcode...' : 'Klik di sini atau tekan tombol Aktifkan Scanner'"
                                     autocomplete="off"
                                 />
                             </div>
@@ -50,6 +54,23 @@
                                 <span>Tambah</span>
                             </button>
                         </div>
+
+                        <!--begin::Tombol aktifkan scanner-->
+                        <div class="mb-5">
+                            <button @click="aktifkanScanner"
+                                class="btn btn-lg w-100"
+                                :class="scannerAktif ? 'btn-success' : 'btn-light-success'">
+                                <i class="ki-duotone ki-scan-barcode fs-2 me-2">
+                                    <span class="path1"></span><span class="path2"></span>
+                                    <span class="path3"></span><span class="path4"></span>
+                                    <span class="path5"></span><span class="path6"></span>
+                                    <span class="path7"></span><span class="path8"></span>
+                                </i>
+                                <span v-if="scannerAktif">&#x1F7E2; Scanner Aktif — Siap Scan dari HP</span>
+                                <span v-else>Aktifkan Scanner HP</span>
+                            </button>
+                        </div>
+                        <!--end::Tombol aktifkan scanner-->
                         <!--end::Input barcode-->
 
                         <!--begin::Notifikasi Error-->
@@ -91,10 +112,11 @@
                             <div class="d-flex flex-stack flex-grow-1">
                                 <div class="fw-semibold">
                                     <div class="fs-6 text-gray-700">
-                                        <strong>Cara penggunaan:</strong><br>
-                                        Arahkan ketik kode produk
-                                        (contoh: <code>PRD0001</code>) lalu tekan <kbd>Enter</kbd>.
-                                        Produk akan langsung masuk ke keranjang.
+                                        <strong>Cara pakai scanner HP:</strong><br>
+                                        1. Install app <strong>Barcode to PC</strong> di HP &amp; laptop.<br>
+                                        2. Tekan tombol <strong>Aktifkan Scanner HP</strong> di atas.<br>
+                                        3. Arahkan kamera HP ke barcode produk — kode otomatis terisi &amp; Enter.<br>
+                                        <span class="text-muted fs-7">Bisa juga ketik manual kode (contoh: <code>PRD0001</code>) lalu tekan <kbd>Enter</kbd>.</span>
                                     </div>
                                 </div>
                             </div>
@@ -380,6 +402,12 @@ const isSearching  = ref(false)
 const errorMsg     = ref('')
 const successMsg   = ref('')
 const barcodeInput = ref(null)
+const scannerAktif = ref(false)
+
+function aktifkanScanner() {
+    barcodeInput.value?.focus()
+    scannerAktif.value = true
+}
 
 function getXsrfToken() {
     return decodeURIComponent(
@@ -428,6 +456,7 @@ async function cariProduk() {
         addToCart(product)
         successMsg.value = `"${product.nama}" ditambahkan ke keranjang.`
         setTimeout(() => { successMsg.value = '' }, 2500)
+        scannerAktif.value = true  // tetap aktif setelah scan berhasil
 
     } catch (e) {
         errorMsg.value = 'Terjadi kesalahan jaringan. Coba lagi.'

@@ -315,7 +315,7 @@ const filteredTransactions = computed(() => {
 })
 
 const total = computed(() =>
-    props.transactions.reduce((s, t) => s + t.total, 0)
+    props.transactions.reduce((s, t) => s + Number(t.total ?? 0), 0)
 )
 
 const applyFilter = () => {
@@ -329,7 +329,7 @@ const excelUrl = computed(() =>
     route('laporan.excel') + `?from=${filter.value.from}&to=${filter.value.to}`
 )
 
-const formatRupiah  = (val) => new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(val ?? 0)
+const formatRupiah  = (val) => new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(Number(val) || 0)
 const formatDateOnly = (val) => new Date(val).toLocaleDateString('id-ID', { day: '2-digit', month: 'short', year: 'numeric' })
 const formatTimeOnly = (val) => new Date(val).toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' })
 </script>
