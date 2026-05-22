@@ -1,6 +1,6 @@
 <script setup>
 import { ref } from 'vue'
-import { router, usePage } from '@inertiajs/vue3'
+import { router, usePage, Link } from '@inertiajs/vue3'
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue'
 import { useSwal } from '@/Composables/useSwal'
 
@@ -10,7 +10,6 @@ const props = defineProps({
 
 const { confirmDelete, toast } = useSwal()
 const page = usePage()
-
 const flash = page.props.flash
 
 const handleToggle = (store) => {
@@ -43,17 +42,19 @@ const handleDelete = async (store) => {
             <i class="ki-duotone ki-shield-tick fs-2hx text-success me-4">
                 <span class="path1"></span><span class="path2"></span>
             </i>
-            <div class="d-flex flex-column">
-                <span>{{ flash.success }}</span>
-            </div>
+            <div>{{ flash.success }}</div>
         </div>
         <div v-if="flash.error" class="alert alert-danger d-flex align-items-center mb-5">
             <i class="ki-duotone ki-shield-cross fs-2hx text-danger me-4">
                 <span class="path1"></span><span class="path2"></span>
             </i>
-            <div class="d-flex flex-column">
-                <span>{{ flash.error }}</span>
-            </div>
+            <div>{{ flash.error }}</div>
+        </div>
+        <div v-if="flash.warning" class="alert alert-warning d-flex align-items-center mb-5">
+            <i class="ki-duotone ki-information fs-2hx text-warning me-4">
+                <span class="path1"></span><span class="path2"></span><span class="path3"></span>
+            </i>
+            <div>{{ flash.warning }}</div>
         </div>
 
         <!-- Header -->
@@ -62,10 +63,10 @@ const handleDelete = async (store) => {
                 <h1 class="fs-2 fw-bold text-gray-900 mb-1">Manajemen Toko</h1>
                 <span class="text-muted fs-6">Total {{ stores.length }} toko terdaftar</span>
             </div>
-            <a :href="route('stores.create')" class="btn btn-primary">
+            <Link :href="route('stores.create')" class="btn btn-primary">
                 <i class="ki-duotone ki-plus fs-2 me-1"></i>
                 Tambah Toko
-            </a>
+            </Link>
         </div>
 
         <!-- Stats Cards -->
@@ -77,8 +78,7 @@ const handleDelete = async (store) => {
                             <span class="symbol-label">
                                 <i class="ki-duotone ki-shop fs-2x text-primary">
                                     <span class="path1"></span><span class="path2"></span>
-                                    <span class="path3"></span><span class="path4"></span>
-                                    <span class="path5"></span>
+                                    <span class="path3"></span><span class="path4"></span><span class="path5"></span>
                                 </i>
                             </span>
                         </div>
@@ -100,9 +100,7 @@ const handleDelete = async (store) => {
                             </span>
                         </div>
                         <div>
-                            <div class="fs-2 fw-bold text-gray-900">
-                                {{ stores.filter(s => s.aktif).length }}
-                            </div>
+                            <div class="fs-2 fw-bold text-gray-900">{{ stores.filter(s => s.aktif).length }}</div>
                             <div class="text-muted fs-7">Toko Aktif</div>
                         </div>
                     </div>
@@ -119,9 +117,7 @@ const handleDelete = async (store) => {
                             </span>
                         </div>
                         <div>
-                            <div class="fs-2 fw-bold text-gray-900">
-                                {{ stores.filter(s => !s.aktif).length }}
-                            </div>
+                            <div class="fs-2 fw-bold text-gray-900">{{ stores.filter(s => !s.aktif).length }}</div>
                             <div class="text-muted fs-7">Toko Nonaktif</div>
                         </div>
                     </div>
@@ -140,8 +136,7 @@ const handleDelete = async (store) => {
                 <div v-if="stores.length === 0" class="text-center py-15">
                     <i class="ki-duotone ki-shop fs-5x text-muted mb-4">
                         <span class="path1"></span><span class="path2"></span>
-                        <span class="path3"></span><span class="path4"></span>
-                        <span class="path5"></span>
+                        <span class="path3"></span><span class="path4"></span><span class="path5"></span>
                     </i>
                     <p class="text-muted fs-5">Belum ada toko. Klik "Tambah Toko" untuk memulai.</p>
                 </div>
@@ -202,7 +197,7 @@ const handleDelete = async (store) => {
                                 </td>
                                 <td class="text-muted fs-7">{{ store.created_at }}</td>
                                 <td class="text-end pe-4">
-                                    <div class="d-flex justify-content-end gap-2">
+                                    <div class="d-flex justify-content-end gap-2 flex-wrap">
                                         <!-- Toggle Aktif -->
                                         <button
                                             @click="handleToggle(store)"
@@ -218,7 +213,7 @@ const handleDelete = async (store) => {
                                         </button>
 
                                         <!-- Edit -->
-                                        
+                                        <Link
                                             :href="route('stores.edit', store.id)"
                                             class="btn btn-sm btn-light-primary"
                                             title="Edit"
@@ -227,7 +222,7 @@ const handleDelete = async (store) => {
                                                 <span class="path1"></span><span class="path2"></span>
                                             </i>
                                             Edit
-                                        
+                                        </Link>
 
                                         <!-- Hapus -->
                                         <button

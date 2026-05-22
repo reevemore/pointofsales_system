@@ -7,21 +7,19 @@ const props = defineProps({
 })
 const emit = defineEmits(['update:collapsed'])
 
-const page    = usePage()
-const role    = computed(() => page.props.auth?.role)
-const toko    = computed(() => page.props.auth?.toko)
+const page = usePage()
+const role = computed(() => page.props.auth?.role)
+const toko = computed(() => page.props.auth?.toko)
 
-const isSuperAdmin = computed(() => role.value === 'superadmin')
-const isAdmin      = computed(() => role.value === 'admin')
-const isKasir      = computed(() => role.value === 'kasir')
+const isSuperAdmin   = computed(() => role.value === 'superadmin')
+const isAdmin        = computed(() => role.value === 'admin')
+const isKasir        = computed(() => role.value === 'kasir')
 const isAdminOrKasir = computed(() => isAdmin.value || isKasir.value)
 
-const isMobile = computed(() => window.innerWidth < 992)
+const isMobile = computed(() => typeof window !== 'undefined' && window.innerWidth < 992)
 
 const isActive = (components) => {
-    if (Array.isArray(components)) {
-        return components.includes(page.component)
-    }
+    if (Array.isArray(components)) return components.includes(page.component)
     return page.component === components
 }
 </script>
@@ -31,7 +29,7 @@ const isActive = (components) => {
     <div
         v-if="isMobile && !props.collapsed"
         @click="emit('update:collapsed', true)"
-        style="position:fixed;inset:0;background:rgba(0,0,0,0.4);z-index:109;"
+        class="sidebar-overlay"
     />
 
     <div
@@ -40,8 +38,8 @@ const isActive = (components) => {
         :class="props.collapsed ? 'sidebar-collapsed' : ''"
     >
         <!-- Logo -->
-        <div class="app-sidebar-logo px-6 d-flex align-items-center" id="kt_app_sidebar_logo">
-            <a :href="isSuperAdmin ? route('stores.index') : route('dashboard')">
+        <div class="app-sidebar-logo d-flex align-items-center" id="kt_app_sidebar_logo">
+            <a :href="isSuperAdmin ? route('stores.index') : route('dashboard')" class="d-flex align-items-center">
                 <img
                     v-show="!props.collapsed"
                     alt="Logo"
@@ -57,11 +55,10 @@ const isActive = (components) => {
             </a>
         </div>
 
-        <!-- Info Toko (hanya untuk admin & kasir) -->
+        <!-- Info Toko (admin & kasir) -->
         <div
             v-if="isAdminOrKasir && toko && !props.collapsed"
-            class="px-6 py-3 mx-3 mb-2 rounded"
-            style="background: rgba(255,255,255,0.07);"
+            class="sidebar-store-info mx-3 mb-2 rounded"
         >
             <div class="d-flex align-items-center gap-3">
                 <div class="symbol symbol-35px symbol-light-primary flex-shrink-0">
@@ -76,11 +73,10 @@ const isActive = (components) => {
             </div>
         </div>
 
-        <!-- Info Superadmin Badge -->
+        <!-- Info Superadmin -->
         <div
             v-if="isSuperAdmin && !props.collapsed"
-            class="px-6 py-3 mx-3 mb-2 rounded"
-            style="background: rgba(255,255,255,0.07);"
+            class="sidebar-store-info mx-3 mb-2 rounded"
         >
             <div class="d-flex align-items-center gap-3">
                 <div class="symbol symbol-35px symbol-light-warning flex-shrink-0">
@@ -113,21 +109,16 @@ const isActive = (components) => {
                     class="menu menu-column menu-rounded menu-sub-indention px-3"
                     data-kt-menu="true"
                 >
-
-                    <!-- ===================== -->
-                    <!-- SUPERADMIN MENU       -->
-                    <!-- ===================== -->
+                    <!-- ==================== -->
+                    <!-- SUPERADMIN MENU      -->
+                    <!-- ==================== -->
                     <template v-if="isSuperAdmin">
-                        <!-- Section Label -->
                         <div class="menu-item" v-show="!props.collapsed">
                             <div class="menu-content pt-8 pb-2">
-                                <span class="menu-section text-muted text-uppercase fs-11 ls-1">
-                                    Manajemen
-                                </span>
+                                <span class="menu-section text-muted text-uppercase fs-11 ls-1">Manajemen</span>
                             </div>
                         </div>
 
-                        <!-- Toko -->
                         <div class="menu-item" :title="props.collapsed ? 'Manajemen Toko' : ''">
                             <Link
                                 :href="route('stores.index')"
@@ -137,8 +128,7 @@ const isActive = (components) => {
                                 <span class="menu-icon">
                                     <i class="ki-duotone ki-shop fs-2">
                                         <span class="path1"></span><span class="path2"></span>
-                                        <span class="path3"></span><span class="path4"></span>
-                                        <span class="path5"></span>
+                                        <span class="path3"></span><span class="path4"></span><span class="path5"></span>
                                     </i>
                                 </span>
                                 <span class="menu-title" v-show="!props.collapsed">Manajemen Toko</span>
@@ -146,21 +136,19 @@ const isActive = (components) => {
                         </div>
                     </template>
 
-                    <!-- ===================== -->
-                    <!-- ADMIN & KASIR MENU    -->
-                    <!-- ===================== -->
+                    <!-- ==================== -->
+                    <!-- ADMIN & KASIR MENU   -->
+                    <!-- ==================== -->
                     <template v-if="isAdminOrKasir">
 
                         <!-- Section: Utama -->
                         <div class="menu-item" v-show="!props.collapsed">
                             <div class="menu-content pt-8 pb-2">
-                                <span class="menu-section text-muted text-uppercase fs-11 ls-1">
-                                    Utama
-                                </span>
+                                <span class="menu-section text-muted text-uppercase fs-11 ls-1">Utama</span>
                             </div>
                         </div>
 
-                        <!-- Dashboard (hanya admin) -->
+                        <!-- Dashboard (admin only) -->
                         <div v-if="isAdmin" class="menu-item" :title="props.collapsed ? 'Dashboard' : ''">
                             <Link
                                 :href="route('dashboard')"
@@ -176,7 +164,7 @@ const isActive = (components) => {
                             </Link>
                         </div>
 
-                        <!-- Transaksi / POS -->
+                        <!-- Transaksi -->
                         <div class="menu-item" :title="props.collapsed ? 'Transaksi' : ''">
                             <Link
                                 :href="route('pos.index')"
@@ -209,17 +197,13 @@ const isActive = (components) => {
                             </Link>
                         </div>
 
-                        <!-- ===================== -->
-                        <!-- ADMIN ONLY MENU       -->
-                        <!-- ===================== -->
+                        <!-- ADMIN ONLY -->
                         <template v-if="isAdmin">
 
                             <!-- Section: Master Data -->
                             <div class="menu-item" v-show="!props.collapsed">
                                 <div class="menu-content pt-8 pb-2">
-                                    <span class="menu-section text-muted text-uppercase fs-11 ls-1">
-                                        Master Data
-                                    </span>
+                                    <span class="menu-section text-muted text-uppercase fs-11 ls-1">Master Data</span>
                                 </div>
                             </div>
 
@@ -232,8 +216,7 @@ const isActive = (components) => {
                                 >
                                     <span class="menu-icon">
                                         <i class="ki-duotone ki-package fs-2">
-                                            <span class="path1"></span><span class="path2"></span>
-                                            <span class="path3"></span>
+                                            <span class="path1"></span><span class="path2"></span><span class="path3"></span>
                                         </i>
                                     </span>
                                     <span class="menu-title" v-show="!props.collapsed">Produk</span>
@@ -267,8 +250,7 @@ const isActive = (components) => {
                                     <span class="menu-icon">
                                         <i class="ki-duotone ki-people fs-2">
                                             <span class="path1"></span><span class="path2"></span>
-                                            <span class="path3"></span><span class="path4"></span>
-                                            <span class="path5"></span>
+                                            <span class="path3"></span><span class="path4"></span><span class="path5"></span>
                                         </i>
                                     </span>
                                     <span class="menu-title" v-show="!props.collapsed">Member</span>
@@ -284,8 +266,7 @@ const isActive = (components) => {
                                 >
                                     <span class="menu-icon">
                                         <i class="ki-duotone ki-cube-2 fs-2">
-                                            <span class="path1"></span><span class="path2"></span>
-                                            <span class="path3"></span>
+                                            <span class="path1"></span><span class="path2"></span><span class="path3"></span>
                                         </i>
                                     </span>
                                     <span class="menu-title" v-show="!props.collapsed">Stok</span>
@@ -295,9 +276,7 @@ const isActive = (components) => {
                             <!-- Section: Laporan -->
                             <div class="menu-item" v-show="!props.collapsed">
                                 <div class="menu-content pt-8 pb-2">
-                                    <span class="menu-section text-muted text-uppercase fs-11 ls-1">
-                                        Laporan
-                                    </span>
+                                    <span class="menu-section text-muted text-uppercase fs-11 ls-1">Laporan</span>
                                 </div>
                             </div>
 
@@ -326,8 +305,7 @@ const isActive = (components) => {
                                 >
                                     <span class="menu-icon">
                                         <i class="ki-duotone ki-chart-pie-4 fs-2">
-                                            <span class="path1"></span><span class="path2"></span>
-                                            <span class="path3"></span>
+                                            <span class="path1"></span><span class="path2"></span><span class="path3"></span>
                                         </i>
                                     </span>
                                     <span class="menu-title" v-show="!props.collapsed">Laporan Profit</span>
@@ -337,9 +315,7 @@ const isActive = (components) => {
                             <!-- Section: Pengaturan -->
                             <div class="menu-item" v-show="!props.collapsed">
                                 <div class="menu-content pt-8 pb-2">
-                                    <span class="menu-section text-muted text-uppercase fs-11 ls-1">
-                                        Pengaturan
-                                    </span>
+                                    <span class="menu-section text-muted text-uppercase fs-11 ls-1">Pengaturan</span>
                                 </div>
                             </div>
 
@@ -371,7 +347,7 @@ const isActive = (components) => {
         </div>
 
         <!-- Sidebar Footer -->
-        <div class="app-sidebar-footer px-6 py-4 border-top border-gray-700" v-show="!props.collapsed">
+        <div class="app-sidebar-footer" v-show="!props.collapsed">
             <div class="text-gray-500 fs-8 text-center">
                 POS Multi-Toko &copy; {{ new Date().getFullYear() }}
             </div>
@@ -379,3 +355,172 @@ const isActive = (components) => {
 
     </div>
 </template>
+
+<style scoped>
+/* =====================================================
+   APP SIDEBAR — Complete Styles
+   ===================================================== */
+.app-sidebar {
+    display: flex;
+    flex-direction: column;
+    width: 265px;
+    min-width: 265px;
+    background-color: #1e1e2d;
+    transition: width 0.3s ease, min-width 0.3s ease;
+    overflow: hidden;
+    height: 100vh;
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 200;
+}
+
+.app-sidebar.sidebar-collapsed {
+    width: 70px;
+    min-width: 70px;
+}
+
+/* Logo area */
+.app-sidebar-logo {
+    padding: 0 1.5rem;
+    height: 70px;
+    min-height: 70px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    flex-shrink: 0;
+}
+
+/* Store info badge */
+.sidebar-store-info {
+    padding: 0.75rem 1rem;
+    background: rgba(255, 255, 255, 0.07);
+    margin-top: 0.5rem;
+}
+
+/* Menu wrapper */
+.app-sidebar-menu {
+    flex: 1;
+    overflow: hidden;
+}
+
+.app-sidebar-wrapper {
+    height: 100%;
+    overflow-y: auto;
+    scrollbar-width: thin;
+    scrollbar-color: rgba(255,255,255,0.1) transparent;
+}
+
+.app-sidebar-wrapper::-webkit-scrollbar {
+    width: 4px;
+}
+.app-sidebar-wrapper::-webkit-scrollbar-thumb {
+    background: rgba(255,255,255,0.15);
+    border-radius: 4px;
+}
+
+/* Menu items */
+.menu-link {
+    display: flex;
+    align-items: center;
+    padding: 0.65rem 0.75rem;
+    border-radius: 0.475rem;
+    color: #9899ac !important;
+    text-decoration: none !important;
+    transition: background-color 0.2s, color 0.2s;
+    white-space: nowrap;
+    overflow: hidden;
+}
+
+.menu-link:hover {
+    background-color: rgba(255, 255, 255, 0.07);
+    color: #ffffff !important;
+}
+
+.menu-link.active {
+    background-color: rgba(255, 255, 255, 0.1);
+    color: #ffffff !important;
+}
+
+.menu-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 2rem;
+    min-width: 2rem;
+    margin-right: 0.75rem;
+    color: inherit;
+}
+
+.sidebar-collapsed .menu-icon {
+    margin-right: 0;
+}
+
+.menu-title {
+    font-size: 0.925rem;
+    font-weight: 500;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+/* Section labels */
+.menu-section {
+    font-size: 0.7rem;
+    letter-spacing: 0.08rem;
+    font-weight: 600;
+    color: #4b4b6b !important;
+    display: block;
+    padding: 0 0.75rem;
+}
+
+/* Sidebar Footer */
+.app-sidebar-footer {
+    padding: 1rem 1.5rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+    flex-shrink: 0;
+}
+
+/* Mobile overlay */
+.sidebar-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.4);
+    z-index: 109;
+}
+
+/* Collapsed: hide text icon tooltips show */
+.sidebar-collapsed .menu-section {
+    display: none;
+}
+
+/* Symbol styles (Metronic-like) */
+.symbol {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+.symbol-35px { width: 35px; height: 35px; }
+.symbol-label {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 0.475rem;
+    background-color: rgba(255, 255, 255, 0.1);
+}
+.symbol-light-primary .symbol-label { background-color: rgba(13, 110, 253, 0.15); }
+.symbol-light-warning .symbol-label  { background-color: rgba(255, 193, 7, 0.15); }
+
+/* Responsive */
+@media (max-width: 991px) {
+    .app-sidebar {
+        transform: translateX(-100%);
+        transition: transform 0.3s ease, width 0.3s ease;
+    }
+    .app-sidebar:not(.sidebar-collapsed) {
+        transform: translateX(0);
+        width: 265px;
+    }
+}
+</style>

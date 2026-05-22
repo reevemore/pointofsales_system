@@ -17,7 +17,7 @@
             <div class="row g-6 mb-6">
                 <!-- Today Revenue -->
                 <div class="col-sm-6 col-xl-3">
-                    <div class="card card-flush bgi-no-repeat bg-light-primary position-relative overflow-hidden h-md-50">
+                    <div class="card card-flush bgi-no-repeat bg-light-primary position-relative overflow-hidden">
                         <div class="card-body">
                             <span class="svg-icon svg-icon-2x svg-icon-primary position-absolute top-0 end-0 me-4 mt-4">
                                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
@@ -32,18 +32,18 @@
                             </span>
                             <div class="d-flex flex-column">
                                 <span class="text-primary fw-bold fs-8 text-uppercase">Pendapatan Hari Ini</span>
-                                <span class="text-dark fw-bolder fs-2x mt-2">{{ formatRupiah(stats.today_revenue) }}</span>
-                                <span class="text-primary fs-8 fw-semibold mt-2">{{ stats.today_count }} transaksi</span>
+                                <span class="text-dark fw-bolder fs-2x mt-2">{{ formatRupiah(stats.pendapatan_hari_ini) }}</span>
+                                <span class="text-primary fs-8 fw-semibold mt-2">{{ stats.transaksi_hari_ini }} transaksi</span>
                             </div>
                         </div>
                     </div>
                 </div>
 
-                <!-- Month Revenue -->
+                <!-- Total Produk -->
                 <div class="col-sm-6 col-xl-3">
-                    <div class="card card-flush bgi-no-repeat bg-light-success position-relative overflow-hidden h-md-50">
+                    <div class="card card-flush bgi-no-repeat bg-light-info position-relative overflow-hidden">
                         <div class="card-body">
-                            <span class="svg-icon svg-icon-2x svg-icon-success position-absolute top-0 end-0 me-4 mt-4">
+                            <span class="svg-icon svg-icon-2x svg-icon-info position-absolute top-0 end-0 me-4 mt-4">
                                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
                                     <path opacity="0.3" d="M16 4H4C2.89543 4 2 4.89543 2 6V18C2 19.1046 2.89543 20 4 20H16C17.1046 20 18 19.1046 18 18V6C18 4.89543 17.1046 4 16 4Z" fill="currentColor"/>
                                     <path d="M11 10C10.4477 10 10 10.4477 10 11C10 11.5523 10.4477 12 11 12H15C15.5523 12 16 11.5523 16 11C16 10.4477 15.5523 10 15 10H11Z" fill="currentColor"/>
@@ -53,30 +53,10 @@
                                 </svg>
                             </span>
                             <div class="d-flex flex-column">
-                                <span class="text-success fw-bold fs-8 text-uppercase">Pendapatan Bulan Ini</span>
-                                <span class="text-dark fw-bolder fs-2x mt-2">{{ formatRupiah(stats.month_revenue) }}</span>
-                                <span class="text-success fs-8 fw-semibold mt-2">Target Penjualan</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Total Products -->
-                <div class="col-sm-6 col-xl-3">
-                    <div class="card card-flush bgi-no-repeat bg-light-info position-relative overflow-hidden h-md-50">
-                        <div class="card-body">
-                            <span class="svg-icon svg-icon-2x svg-icon-info position-absolute top-0 end-0 me-4 mt-4">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
-                                    <path opacity="0.3" d="M10 3.5C10 2.11929 11.1193 1 12.5 1C13.8807 1 15 2.11929 15 3.5V5.5C15 6.88071 13.8807 8 12.5 8C11.1193 8 10 6.88071 10 5.5V3.5Z" fill="currentColor"/>
-                                    <path d="M17.5 15.5C17.5 16.8807 16.3807 18 15 18H2C0.895431 18 0 17.1046 0 16V10.5C0 9.39543 0.895431 8.5 2 8.5H15C16.3807 8.5 17.5 9.61929 17.5 11V15.5Z" fill="currentColor"/>
-                                    <path d="M20.5 15.5C20.5 16.8807 19.3807 18 18 18H16.5C17.8807 18 19 16.8807 19 15.5V11C19 9.61929 17.8807 8.5 16.5 8.5H18C19.3807 8.5 20.5 9.61929 20.5 11V15.5Z" fill="currentColor"/>
-                                </svg>
-                            </span>
-                            <div class="d-flex flex-column">
                                 <span class="text-info fw-bold fs-8 text-uppercase">Total Produk</span>
-                                <span class="text-dark fw-bolder fs-2x mt-2">{{ stats.total_products }}</span>
-                                <span v-if="stats.low_stock > 0" class="text-danger fs-8 fw-semibold mt-2">
-                                    ⚠️ {{ stats.low_stock }} stok menipis
+                                <span class="text-dark fw-bolder fs-2x mt-2">{{ stats.total_produk }}</span>
+                                <span v-if="stokMenipis.length > 0" class="text-danger fs-8 fw-semibold mt-2">
+                                    ⚠️ {{ stokMenipis.length }} stok menipis
                                 </span>
                                 <span v-else class="text-info fs-8 fw-semibold mt-2">Stok Tersedia</span>
                             </div>
@@ -86,18 +66,37 @@
 
                 <!-- Total Members -->
                 <div class="col-sm-6 col-xl-3">
-                    <div class="card card-flush bgi-no-repeat bg-light-warning position-relative overflow-hidden h-md-50">
+                    <div class="card card-flush bgi-no-repeat bg-light-warning position-relative overflow-hidden">
                         <div class="card-body">
                             <span class="svg-icon svg-icon-2x svg-icon-warning position-absolute top-0 end-0 me-4 mt-4">
                                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
-                                    <path d="M16.0336 9.62611E-08L19.3616 3.32793C20.1513 4.11775 20.6342 5.18848 20.6342 6.11216C20.6342 8.21263 19.2673 9.95722 17.transilv2 11.3506C16.8505 11.8268 16.6559 12.0149 16.4073 12.0149C16.1587 12.0149 15.964 11.8268 15.5748 11.4515C14.4818 10.4282 12.64 9.42225 10.7347 9.42225C10.4779 9.42225 10.3123 9.42225 10.0274 9.43141L5.54withdrawNamespace 4.94401C4.77233 4.16993 4.77233 2.97274 5.54withdrawNamespace 2.19866L8.86793 -1.08849e-07C9.65766 -0.789749 10.7284 -1.08849e-07 11.6519 -1.08849e-07L16.0336 9.62611E-08Z" fill="currentColor"/>
-                                    <path opacity="0.3" d="M3.20296 14.6684L1.41421 16.4571C0.633591 17.2312 0.633591 18.4284 1.41421 19.2025L4.13223 21.9205C4.90285 22.6946 6.10898 22.6946 6.88959 21.9205C7.66625 21.1464 7.66625 19.9492 6.88959 19.1751L5.10084 17.3864C4.81003 17.0956 4.81003 16.6353 5.10084 16.3444C5.39165 16.0536 5.85192 16.0536 6.14273 16.3444L7.93148 18.1331C8.70209 18.9072 9.90822 18.9072 10.6888 18.1331C11.4655 17.359 11.4655 16.1618 10.6888 15.3877L8.88012 13.599C8.58932 13.3082 8.58932 12.8479 8.88012 12.557C9.17092 12.2662 9.6312 12.2662 9.922 12.557L11.7317 14.3457C12.5023 15.1198 13.7085 15.1198 14.4891 14.3457C15.2657 13.5716 15.2657 12.3744 14.4891 11.6003L12.6804 9.81151C12.3896 9.52071 12.3896 9.06043 12.6804 8.76962C12.9712 8.47882 13.4315 8.47882 13.7223 8.76962L15.531 10.5583C16.3016 11.3324 17.5078 11.3324 18.2884 10.5583C19.065 9.78424 19.065 8.5871 18.2884 7.813L16.4997 6.02424C16.2089 5.73344 16.2089 5.27316 16.4997 4.98236C16.7905 4.69155 17.2508 4.69155 17.5416 4.98236L19.3303 6.77112C20.1009 7.54552 21.3071 7.54552 22.0876 6.77112C22.8643 6.00671 22.8643 4.80957 22.0876 4.03517L19.3696 1.31715C18.599 0.542742 17.3928 0.542742 16.6122 1.31715L3.20296 14.6684Z" fill="currentColor"/>
+                                    <path opacity="0.3" d="M12 11C9.79086 11 8 9.20914 8 7C8 4.79086 9.79086 3 12 3C14.2091 3 16 4.79086 16 7C16 9.20914 14.2091 11 12 11Z" fill="currentColor"/>
+                                    <path d="M3.00065 20.1992C3.38826 15.4265 7.26191 13 11.9833 13C16.7712 13 20.7049 15.2932 20.9979 20.2C21.0096 20.3955 20.9979 21 20.2467 21C16.5411 21 11.0347 21 3.7275 21C3.0628 21 2.9862 20.4592 3.00065 20.1992Z" fill="currentColor"/>
                                 </svg>
                             </span>
                             <div class="d-flex flex-column">
                                 <span class="text-warning fw-bold fs-8 text-uppercase">Total Member</span>
-                                <span class="text-dark fw-bolder fs-2x mt-2">{{ stats.total_members }}</span>
-                                <span class="text-warning fs-8 fw-semibold mt-2">Aktif Berbelanja</span>
+                                <span class="text-dark fw-bolder fs-2x mt-2">{{ stats.total_member }}</span>
+                                <span class="text-warning fs-8 fw-semibold mt-2">Member Aktif</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Stok Menipis Alert -->
+                <div class="col-sm-6 col-xl-3">
+                    <div class="card card-flush bgi-no-repeat bg-light-danger position-relative overflow-hidden">
+                        <div class="card-body">
+                            <span class="svg-icon svg-icon-2x svg-icon-danger position-absolute top-0 end-0 me-4 mt-4">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
+                                    <path opacity="0.3" d="M20.5543 4.37824L12.1798 2.02473C12.0626 1.99176 11.9376 1.99176 11.8203 2.02473L3.44572 4.37824C3.18118 4.45258 3 4.6807 3 4.93945V13.569C3 14.6914 3.48509 15.8404 4.4417 16.984C5.17231 17.8575 6.18314 18.7345 7.446 19.5773C9.56752 21.0244 11.6566 21.912 11.7445 21.9488C11.8258 21.9829 11.9129 22 12.0001 22C12.0872 22 12.1744 21.983 12.2557 21.9488C12.3435 21.912 14.4326 21.0244 16.5541 19.5773C17.8169 18.7345 18.8277 17.8575 19.5584 16.984C20.515 15.8404 21 14.6914 21 13.569V4.93945C21 4.6807 20.8189 4.45258 20.5543 4.37824Z" fill="currentColor"/>
+                                    <path d="M10.5606 11.3042L9.57283 10.3018C9.28174 10.0065 8.80522 10.0065 8.51412 10.3018C8.22897 10.5912 8.22897 11.0559 8.51412 11.3452L10.4182 13.2773C10.8099 13.6747 11.451 13.6747 11.8427 13.2773L15.4859 9.58051C15.771 9.29117 15.771 8.82648 15.4859 8.53714C15.1948 8.24181 14.7183 8.24181 14.4272 8.53714L11.2659 11.3042C11.0608 11.5099 10.7657 11.5099 10.5606 11.3042Z" fill="currentColor"/>
+                                </svg>
+                            </span>
+                            <div class="d-flex flex-column">
+                                <span class="text-danger fw-bold fs-8 text-uppercase">Stok Menipis</span>
+                                <span class="text-dark fw-bolder fs-2x mt-2">{{ stokMenipis.length }}</span>
+                                <span class="text-danger fs-8 fw-semibold mt-2">Produk perlu diisi</span>
                             </div>
                         </div>
                     </div>
@@ -106,7 +105,7 @@
 
             <!-- Charts Row -->
             <div class="row g-6 mb-6">
-                <!-- Revenue Chart (Line/Bar) -->
+                <!-- Revenue Chart -->
                 <div class="col-xl-8">
                     <div class="card card-flush">
                         <div class="card-header border-0 pt-5">
@@ -115,12 +114,13 @@
                                 <span class="text-muted mt-1 fw-semibold fs-7">Total penjualan per hari</span>
                             </h3>
                             <div class="card-toolbar">
-                                <span class="badge badge-light-primary">{{ stats.today_count }} Transaksi</span>
+                                <span class="badge badge-light-primary">{{ stats.transaksi_hari_ini }} Transaksi Hari Ini</span>
                             </div>
                         </div>
                         <div class="card-body">
-                            <div v-if="weeklyData.length === 0" class="text-center text-muted py-10">
-                                Belum ada data transaksi
+                            <div v-if="!grafikPenjualan || grafikPenjualan.length === 0" class="text-center text-muted py-10">
+                                <i class="ki-duotone ki-chart-line fs-3x text-muted mb-3"><span class="path1"></span><span class="path2"></span></i>
+                                <p>Belum ada data transaksi</p>
                             </div>
                             <canvas v-else id="revenueChart" style="height: 300px;"></canvas>
                         </div>
@@ -133,12 +133,13 @@
                         <div class="card-header border-0 pt-5">
                             <h3 class="card-title align-items-start flex-column">
                                 <span class="card-label fw-bold text-dark">Produk Terlaris (Top 5)</span>
-                                <span class="text-muted mt-1 fw-semibold fs-7">Berdasarkan penjualan</span>
+                                <span class="text-muted mt-1 fw-semibold fs-7">Bulan ini berdasarkan qty</span>
                             </h3>
                         </div>
                         <div class="card-body">
-                            <div v-if="topProducts.length === 0" class="text-center text-muted py-10">
-                                Belum ada data
+                            <div v-if="!produkTerlaris || produkTerlaris.length === 0" class="text-center text-muted py-10">
+                                <i class="ki-duotone ki-package fs-3x text-muted mb-3"><span class="path1"></span><span class="path2"></span><span class="path3"></span></i>
+                                <p>Belum ada data</p>
                             </div>
                             <canvas v-else id="topProductsChart" style="height: 250px;"></canvas>
                         </div>
@@ -146,33 +147,15 @@
                 </div>
             </div>
 
-            <!-- Additional Charts Row -->
+            <!-- Transactions + Stok Menipis Row -->
             <div class="row g-6 mb-6">
-                <!-- Payment Methods -->
-                <div class="col-xl-4">
-                    <div class="card card-flush h-100">
-                        <div class="card-header border-0 pt-5">
-                            <h3 class="card-title align-items-start flex-column">
-                                <span class="card-label fw-bold text-dark">Metode Pembayaran</span>
-                                <span class="text-muted mt-1 fw-semibold fs-7">Distribusi pembayaran</span>
-                            </h3>
-                        </div>
-                        <div class="card-body d-flex justify-content-center">
-                            <div v-if="recentTransactions.length === 0" class="text-center text-muted py-10 w-100">
-                                Belum ada data
-                            </div>
-                            <canvas v-else id="paymentMethodsChart" style="height: 250px; width: 250px;"></canvas>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Recent Transactions Summary -->
+                <!-- Recent Transactions -->
                 <div class="col-xl-8">
                     <div class="card card-flush">
                         <div class="card-header border-0 pt-5">
                             <h3 class="card-title align-items-start flex-column">
                                 <span class="card-label fw-bold text-dark">Transaksi Terbaru</span>
-                                <span class="text-muted mt-1 fw-semibold fs-7">{{ recentTransactions.length }} transaksi terakhir</span>
+                                <span class="text-muted mt-1 fw-semibold fs-7">{{ transaksiTerbaru.length }} transaksi terakhir</span>
                             </h3>
                             <div class="card-toolbar">
                                 <Link :href="route('pos.history')" class="btn btn-sm btn-light">
@@ -181,8 +164,9 @@
                             </div>
                         </div>
                         <div class="card-body pt-0">
-                            <div v-if="recentTransactions.length === 0" class="text-center text-muted py-10">
-                                Belum ada transaksi
+                            <div v-if="!transaksiTerbaru || transaksiTerbaru.length === 0" class="text-center text-muted py-10">
+                                <i class="ki-duotone ki-document fs-3x text-muted mb-3"><span class="path1"></span><span class="path2"></span></i>
+                                <p>Belum ada transaksi</p>
                             </div>
                             <div v-else class="table-responsive">
                                 <table class="table table-row-dashed align-middle gs-0 gy-4">
@@ -197,17 +181,17 @@
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        <tr v-for="trx in recentTransactions" :key="trx.id" class="border-bottom">
+                                        <tr v-for="trx in transaksiTerbaru" :key="trx.id" class="border-bottom">
                                             <td class="ps-4">
                                                 <span class="badge badge-light-primary fw-bold">
                                                     {{ trx.no_transaksi }}
                                                 </span>
                                             </td>
                                             <td>
-                                                <span class="fw-semibold">{{ trx.user?.name ?? '-' }}</span>
+                                                <span class="fw-semibold">{{ trx.kasir ?? '-' }}</span>
                                             </td>
                                             <td>
-                                                <span class="fw-semibold">{{ trx.member?.nama ?? '-' }}</span>
+                                                <span class="fw-semibold">{{ trx.member ?? '-' }}</span>
                                             </td>
                                             <td class="fw-bold text-success fs-6">{{ formatRupiah(trx.total) }}</td>
                                             <td>
@@ -217,13 +201,53 @@
                                                         'badge-light-info': trx.metode_bayar === 'transfer',
                                                         'badge-light-warning': trx.metode_bayar === 'qris',
                                                     }">
-                                                    {{ trx.metode_bayar.toUpperCase() }}
+                                                    {{ trx.metode_bayar?.toUpperCase() }}
                                                 </span>
                                             </td>
-                                            <td class="text-muted fs-7">{{ formatDate(trx.created_at) }}</td>
+                                            <td class="text-muted fs-7">{{ trx.created_at }}</td>
                                         </tr>
                                     </tbody>
                                 </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Stok Menipis -->
+                <div class="col-xl-4">
+                    <div class="card card-flush h-100">
+                        <div class="card-header border-0 pt-5">
+                            <h3 class="card-title align-items-start flex-column">
+                                <span class="card-label fw-bold text-dark">⚠️ Stok Menipis</span>
+                                <span class="text-muted mt-1 fw-semibold fs-7">Produk dengan stok ≤ 10</span>
+                            </h3>
+                        </div>
+                        <div class="card-body pt-0">
+                            <div v-if="!stokMenipis || stokMenipis.length === 0" class="text-center text-muted py-10">
+                                <i class="ki-duotone ki-shield-tick fs-3x text-success mb-3"><span class="path1"></span><span class="path2"></span></i>
+                                <p>Semua stok aman!</p>
+                            </div>
+                            <div v-else>
+                                <div
+                                    v-for="produk in stokMenipis"
+                                    :key="produk.id"
+                                    class="d-flex align-items-center justify-content-between py-3 border-bottom"
+                                >
+                                    <div class="d-flex align-items-center gap-3">
+                                        <div class="symbol symbol-35px symbol-light-danger">
+                                            <span class="symbol-label fw-bold text-danger fs-7">
+                                                {{ produk.nama?.charAt(0)?.toUpperCase() }}
+                                            </span>
+                                        </div>
+                                        <div>
+                                            <div class="fw-semibold text-gray-800 fs-7">{{ produk.nama }}</div>
+                                            <div class="text-muted fs-8">{{ produk.satuan }}</div>
+                                        </div>
+                                    </div>
+                                    <span class="badge badge-light-danger fw-bold">
+                                        {{ produk.stok }} tersisa
+                                    </span>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -235,258 +259,130 @@
 </template>
 
 <script setup>
-import { computed, onMounted, ref } from 'vue'
-import { Link } from '@inertiajs/vue3'
-import { Head } from '@inertiajs/vue3'
+import { onMounted } from 'vue'
+import { Link, Head } from '@inertiajs/vue3'
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue'
 import Chart from 'chart.js/auto'
 
 const props = defineProps({
-    stats:              Object,
-    weeklyData:         Array,
-    topProducts:        Array,
-    recentTransactions: Array,
+    stats:             Object,
+    stokMenipis:       Array,
+    grafikPenjualan:   Array,
+    transaksiTerbaru:  Array,
+    produkTerlaris:    Array,
 })
 
-let revenueChart = null
-let topProductsChart = null
-let paymentMethodsChart = null
+let revenueChart      = null
+let topProductsChart  = null
 
 const formatRupiah = (val) => new Intl.NumberFormat('id-ID', {
     style: 'currency', currency: 'IDR', minimumFractionDigits: 0
 }).format(val ?? 0)
 
-const formatDate = (val) => new Date(val).toLocaleString('id-ID', {
-    day: '2-digit', month: 'short', year: 'numeric',
-    hour: '2-digit', minute: '2-digit'
-})
-
-const chartData = computed(() => {
-    const days = []
-    for (let i = 6; i >= 0; i--) {
-        const d = new Date()
-        d.setDate(d.getDate() - i)
-        const dateStr = d.toISOString().split('T')[0]
-        const found = props.weeklyData.find(w => w.date === dateStr)
-        days.push({
-            date: dateStr,
-            label: d.toLocaleDateString('id-ID', { weekday: 'short', day: 'numeric' }),
-            total: found?.total ?? 0,
-        })
-    }
-    const max = Math.max(...days.map(d => d.total), 1)
-    return days.map(d => ({ ...d, height: Math.round((d.total / max) * 160) }))
-})
-
-// Initialize Charts
 onMounted(() => {
-    if (props.weeklyData.length > 0) {
+    if (props.grafikPenjualan && props.grafikPenjualan.length > 0) {
         initRevenueChart()
     }
-    if (props.topProducts.length > 0) {
+    if (props.produkTerlaris && props.produkTerlaris.length > 0) {
         initTopProductsChart()
-    }
-    if (props.recentTransactions.length > 0) {
-        initPaymentMethodsChart()
     }
 })
 
 const initRevenueChart = () => {
-    const days = []
+    const days     = []
     const revenues = []
-    
+
     for (let i = 6; i >= 0; i--) {
-        const d = new Date()
+        const d       = new Date()
         d.setDate(d.getDate() - i)
         const dateStr = d.toISOString().split('T')[0]
-        const found = props.weeklyData.find(w => w.date === dateStr)
+        const found   = props.grafikPenjualan.find(w => w.tanggal === dateStr)
         days.push(d.toLocaleDateString('id-ID', { weekday: 'short', day: 'numeric' }))
         revenues.push(found?.total ?? 0)
     }
 
     const ctx = document.getElementById('revenueChart')
-    if (ctx) {
-        revenueChart = new Chart(ctx, {
-            type: 'bar',
-            data: {
-                labels: days,
-                datasets: [{
-                    label: 'Pendapatan (Rp)',
-                    data: revenues,
-                    backgroundColor: '#0d6efd',
-                    borderColor: '#0d6efd',
-                    borderWidth: 0,
-                    borderRadius: 4,
-                    barThickness: 'flex',
-                    maxBarThickness: 30,
-                }]
+    if (!ctx) return
+
+    if (revenueChart) revenueChart.destroy()
+    revenueChart = new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: days,
+            datasets: [{
+                label: 'Pendapatan (Rp)',
+                data: revenues,
+                backgroundColor: 'rgba(13, 110, 253, 0.8)',
+                borderColor: '#0d6efd',
+                borderWidth: 0,
+                borderRadius: 6,
+                maxBarThickness: 40,
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: { display: false },
+                tooltip: {
+                    callbacks: {
+                        label: (ctx) => formatRupiah(ctx.raw)
+                    }
+                }
             },
-            options: {
-                indexAxis: 'x',
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: {
-                    legend: {
-                        display: false,
-                    },
-                },
-                scales: {
-                    y: {
-                        beginAtZero: true,
-                        ticks: {
-                            callback: (value) => formatRupiah(value)
-                        }
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    ticks: {
+                        callback: (value) => formatRupiah(value)
                     }
                 }
             }
-        })
-    }
+        }
+    })
 }
 
 const initTopProductsChart = () => {
-    const labels = props.topProducts.slice(0, 5).map(p => p.nama)
-    const data = props.topProducts.slice(0, 5).map(p => p.total_qty)
-    
+    const labels = props.produkTerlaris.slice(0, 5).map(p => p.nama)
+    const data   = props.produkTerlaris.slice(0, 5).map(p => p.total_qty)
+
     const ctx = document.getElementById('topProductsChart')
-    if (ctx) {
-        topProductsChart = new Chart(ctx, {
-            type: 'doughnut',
-            data: {
-                labels: labels,
-                datasets: [{
-                    data: data,
-                    backgroundColor: [
-                        '#0d6efd',
-                        '#198754',
-                        '#ffc107',
-                        '#20c997',
-                        '#fd7e14'
-                    ],
-                    borderColor: '#fff',
-                    borderWidth: 2
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: {
-                    legend: {
-                        position: 'bottom',
-                        labels: {
-                            padding: 15,
-                            font: {
-                                size: 12
-                            }
-                        }
-                    }
+    if (!ctx) return
+
+    if (topProductsChart) topProductsChart.destroy()
+    topProductsChart = new Chart(ctx, {
+        type: 'doughnut',
+        data: {
+            labels,
+            datasets: [{
+                data,
+                backgroundColor: ['#0d6efd','#198754','#ffc107','#20c997','#fd7e14'],
+                borderColor: '#fff',
+                borderWidth: 2
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    position: 'bottom',
+                    labels: { padding: 15, font: { size: 12 } }
                 }
             }
-        })
-    }
-}
-
-const initPaymentMethodsChart = () => {
-    const paymentData = {
-        tunai: 0,
-        transfer: 0,
-        qris: 0
-    }
-    
-    props.recentTransactions.forEach(trx => {
-        if (paymentData.hasOwnProperty(trx.metode_bayar)) {
-            paymentData[trx.metode_bayar]++
         }
     })
-    
-    const ctx = document.getElementById('paymentMethodsChart')
-    if (ctx) {
-        paymentMethodsChart = new Chart(ctx, {
-            type: 'doughnut',
-            data: {
-                labels: ['Tunai', 'Transfer', 'QRIS'],
-                datasets: [{
-                    data: [paymentData.tunai, paymentData.transfer, paymentData.qris],
-                    backgroundColor: [
-                        '#198754',
-                        '#0dcaf0',
-                        '#ffc107'
-                    ],
-                    borderColor: '#fff',
-                    borderWidth: 2
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: {
-                    legend: {
-                        position: 'bottom',
-                        labels: {
-                            padding: 15,
-                            font: {
-                                size: 12
-                            }
-                        }
-                    }
-                }
-            }
-        })
-    }
 }
 </script>
 
 <style scoped>
-.bgi-no-repeat {
-    background-repeat: no-repeat !important;
-}
-
-.bg-light-primary {
-    background-color: rgba(13, 110, 253, 0.1) !important;
-}
-
-.bg-light-success {
-    background-color: rgba(25, 135, 84, 0.1) !important;
-}
-
-.bg-light-info {
-    background-color: rgba(13, 202, 240, 0.1) !important;
-}
-
-.bg-light-warning {
-    background-color: rgba(255, 193, 7, 0.1) !important;
-}
-
-.svg-icon {
-    display: inline-block;
-}
-
-.card-title {
-    margin-bottom: 0;
-}
-
-.page-title {
-    padding-bottom: 1rem;
-}
-
-.page-heading {
-    font-size: 2rem;
-}
-
-.page-desc {
-    font-size: 0.875rem;
-    color: #6c757d;
-}
-
-.h-md-50 {
-    min-height: 200px;
-}
-
-.table-responsive {
-    border-radius: 0.475rem;
-}
-
-.badge {
-    padding: 0.35rem 0.65rem;
-    font-size: 0.75rem;
-}
+.bg-light-primary { background-color: rgba(13, 110, 253, 0.1) !important; }
+.bg-light-success { background-color: rgba(25, 135, 84, 0.1) !important; }
+.bg-light-info    { background-color: rgba(13, 202, 240, 0.1) !important; }
+.bg-light-warning { background-color: rgba(255, 193, 7, 0.1) !important; }
+.bg-light-danger  { background-color: rgba(220, 53, 69, 0.1) !important; }
+.bgi-no-repeat    { background-repeat: no-repeat !important; }
+.card             { min-height: 150px; }
+.card-title       { margin-bottom: 0; }
+.badge            { padding: 0.35rem 0.65rem; font-size: 0.75rem; }
 </style>

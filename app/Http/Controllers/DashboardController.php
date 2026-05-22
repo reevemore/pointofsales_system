@@ -18,10 +18,9 @@ class DashboardController extends Controller
         session(['pageTitle' => 'Dashboard', 'pageSubtitle' => 'Ringkasan toko hari ini']);
 
         $tokoId = $this->tokoId();
+        $today  = now()->toDateString();
 
-        // Statistik hari ini
-        $today = now()->toDateString();
-
+        // ── Statistik Utama ──────────────────────────────────────────────
         $transaksiHariIni = Transaction::where('toko_id', $tokoId)
             ->whereDate('created_at', $today)
             ->where('payment_status', 'paid')
@@ -40,6 +39,7 @@ class DashboardController extends Controller
             ->where('status', true)
             ->count();
 
+        // ── Stok Menipis ─────────────────────────────────────────────────
         $stokMenipis = Product::where('toko_id', $tokoId)
             ->where('aktif', true)
             ->where('stok', '<=', 10)
@@ -47,7 +47,7 @@ class DashboardController extends Controller
             ->limit(5)
             ->get(['id', 'nama', 'stok', 'satuan']);
 
-        // Grafik 7 hari terakhir
+        // ── Grafik 7 Hari Terakhir ────────────────────────────────────────
         $grafikPenjualan = Transaction::where('toko_id', $tokoId)
             ->where('payment_status', 'paid')
             ->whereDate('created_at', '>=', now()->subDays(6)->toDateString())
@@ -60,7 +60,7 @@ class DashboardController extends Controller
             ->orderBy('tanggal')
             ->get();
 
-        // Transaksi terbaru
+        // ── Transaksi Terbaru ─────────────────────────────────────────────
         $transaksiTerbaru = Transaction::where('toko_id', $tokoId)
             ->with(['member', 'user'])
             ->where('payment_status', 'paid')
@@ -77,14 +77,14 @@ class DashboardController extends Controller
                 'created_at'   => $t->created_at->format('d/m/Y H:i'),
             ]);
 
-        // Produk terlaris bulan ini
+        // ── Produk Terlaris Bulan Ini ─────────────────────────────────────
         $produkTerlaris = DB::table('transaction_items')
-            ->join('products', 'products.id', '=', 'transaction_items.product_id')
+            ->join('products',     'products.id',     '=', 'transaction_items.product_id')
             ->join('transactions', 'transactions.id', '=', 'transaction_items.transaction_id')
             ->where('transactions.toko_id', $tokoId)
             ->where('transactions.payment_status', 'paid')
             ->whereMonth('transactions.created_at', now()->month)
-            ->whereYear('transactions.created_at', now()->year)
+            ->whereYear('transactions.created_at',  now()->year)
             ->select(
                 'products.nama',
                 DB::raw('SUM(transaction_items.qty) as total_qty'),
@@ -96,16 +96,17 @@ class DashboardController extends Controller
             ->get();
 
         return Inertia::render('Dashboard', [
+            // Key stats — sesuai dengan props di Dashboard.vue
             'stats' => [
                 'transaksi_hari_ini'  => $transaksiHariIni,
                 'pendapatan_hari_ini' => $pendapatanHariIni,
                 'total_produk'        => $totalProduk,
                 'total_member'        => $totalMember,
             ],
-            'stok_menipis'     => $stokMenipis,
-            'grafik_penjualan' => $grafikPenjualan,
-            'transaksi_terbaru'=> $transaksiTerbaru,
-            'produk_terlaris'  => $produkTerlaris,
+            'stokMenipis'      => $stokMenipis,
+            'grafikPenjualan'  => $grafikPenjualan,
+            'transaksiTerbaru' => $transaksiTerbaru,
+            'produkTerlaris'   => $produkTerlaris,
         ]);
     }
 }
