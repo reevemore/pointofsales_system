@@ -5,77 +5,75 @@ namespace App\Exports;
 use App\Models\Transaction;
 use Maatwebsite\Excel\Concerns\FromCollection;
 use Maatwebsite\Excel\Concerns\WithHeadings;
+use Maatwebsite\Excel\Concerns\WithMapping;
 use Maatwebsite\Excel\Concerns\WithStyles;
-use Maatwebsite\Excel\Concerns\WithColumnWidths;
 use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
 
-class LaporanExport implements FromCollection, WithHeadings, WithStyles, WithColumnWidths
+class LaporanExport implements FromCollection, WithHeadings, WithMapping, WithStyles
 {
-    public function __construct(private string $from, private string $to) {}
+    protected array $filters;
+    protected int $tokoId;
+
+    public function __construct(array $filters, int $tokoId)
+    {
+        $this->filters = $filters;
+        $this->tokoId  = $tokoId;
+    }
 
     public function collection()
     {
-        return Transaction::with(['user', 'member', 'items'])
-            ->whereDate('created_at', '>=', $this->from)
-            ->whereDate('created_at', '<=', $this->to)
-            ->latest()
-            ->get()
-            ->map(fn($t) => [
-                $t->no_transaksi,
-                $t->user?->name ?? '-',
-                $t->member?->nama ?? '-',
-                $t->items->count(),
-                $t->subtotal,
-                $t->diskon,
-                $t->total,
-                $t->bayar,
-                $t->kembali,
-                strtoupper($t->metode_bayar),
-                $t->created_at->format('d/m/Y H:i'),
-            ]);
+        $query = Transaction::where('toko_id', $this->tokoId)
+            ->with(['member', 'user', 'items.product'])
+            ->where('payment_status', 'paid');
+
+        if (!empty($this->filters['dari'])) {
+            $query->whereDate('created_at', '>=', $this->filters['dari']);
+        }
+        if (!empty($this->filters['sampai'])) {
+            $query->whereDate('created_at', '<=', $this->filters['sampai']);
+        }
+
+        return $query->latest()->get();
     }
 
     public function headings(): array
     {
         return [
             'No. Transaksi',
+            'Tanggal',
             'Kasir',
             'Member',
-            'Items',
             'Subtotal',
             'Diskon',
             'Total',
             'Bayar',
             'Kembali',
-            'Metode',
-            'Waktu',
+            'Metode Bayar',
+            'Status',
+        ];
+    }
+
+    public function map($transaction): array
+    {
+        return [
+            $transaction->no_transaksi,
+            $transaction->created_at->format('d/m/Y H:i'),
+            $transaction->user?->name ?? '-',
+            $transaction->member?->nama ?? '-',
+            $transaction->subtotal,
+            $transaction->diskon,
+            $transaction->total,
+            $transaction->bayar,
+            $transaction->kembali,
+            strtoupper($transaction->metode_bayar),
+            $transaction->payment_status,
         ];
     }
 
     public function styles(Worksheet $sheet): array
     {
         return [
-            1 => [
-                'font' => ['bold' => true, 'color' => ['rgb' => 'FFFFFF']],
-                'fill' => ['fillType' => 'solid', 'startColor' => ['rgb' => '3B82F6']],
-            ],
-        ];
-    }
-
-    public function columnWidths(): array
-    {
-        return [
-            'A' => 20,
-            'B' => 16,
-            'C' => 16,
-            'D' => 8,
-            'E' => 16,
-            'F' => 12,
-            'G' => 16,
-            'H' => 16,
-            'I' => 14,
-            'J' => 10,
-            'K' => 18,
+            1 => ['font' => ['bold' => true]],
         ];
     }
 }

@@ -5,36 +5,35 @@ namespace App\Exports;
 use App\Models\Transaction;
 use Maatwebsite\Excel\Concerns\FromCollection;
 use Maatwebsite\Excel\Concerns\WithHeadings;
+use Maatwebsite\Excel\Concerns\WithMapping;
 use Maatwebsite\Excel\Concerns\WithStyles;
-use Maatwebsite\Excel\Concerns\WithColumnWidths;
 use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
 
-class LaporanProfitExport implements FromCollection, WithHeadings, WithStyles, WithColumnWidths
+class LaporanProfitExport implements FromCollection, WithHeadings, WithMapping, WithStyles
 {
-    public function __construct(private string $from, private string $to) {}
+    protected array $filters;
+    protected int $tokoId;
+
+    public function __construct(array $filters, int $tokoId)
+    {
+        $this->filters = $filters;
+        $this->tokoId  = $tokoId;
+    }
 
     public function collection()
     {
-        return Transaction::with(['items.product'])
-            ->whereDate('created_at', '>=', $this->from)
-            ->whereDate('created_at', '<=', $this->to)
-            ->where('payment_status', 'paid')
-            ->latest()
-            ->get()
-            ->map(function ($trx) {
-                $modal  = $trx->items->sum(fn($i) => ($i->product->harga_beli ?? 0) * $i->qty);
-                $profit = $trx->total - $modal;
-                $margin = $trx->total > 0 ? round(($profit / $trx->total) * 100, 1) : 0;
+        $query = Transaction::where('toko_id', $this->tokoId)
+            ->with(['items.product'])
+            ->where('payment_status', 'paid');
 
-                return [
-                    $trx->no_transaksi,
-                    $trx->created_at->format('d/m/Y H:i'),
-                    $trx->total,
-                    $modal,
-                    $profit,
-                    $margin . '%',
-                ];
-            });
+        if (!empty($this->filters['dari'])) {
+            $query->whereDate('created_at', '>=', $this->filters['dari']);
+        }
+        if (!empty($this->filters['sampai'])) {
+            $query->whereDate('created_at', '<=', $this->filters['sampai']);
+        }
+
+        return $query->latest()->get();
     }
 
     public function headings(): array
@@ -42,32 +41,31 @@ class LaporanProfitExport implements FromCollection, WithHeadings, WithStyles, W
         return [
             'No. Transaksi',
             'Tanggal',
-            'Omzet (Rp)',
-            'Modal/HPP (Rp)',
-            'Profit (Rp)',
-            'Margin',
+            'Total Penjualan',
+            'HPP',
+            'Profit',
+        ];
+    }
+
+    public function map($transaction): array
+    {
+        $hpp = $transaction->items->sum(
+            fn($item) => ($item->product->harga_beli ?? 0) * $item->qty
+        );
+
+        return [
+            $transaction->no_transaksi,
+            $transaction->created_at->format('d/m/Y H:i'),
+            $transaction->total,
+            $hpp,
+            $transaction->total - $hpp,
         ];
     }
 
     public function styles(Worksheet $sheet): array
     {
         return [
-            1 => [
-                'font' => ['bold' => true, 'color' => ['rgb' => 'FFFFFF']],
-                'fill' => ['fillType' => 'solid', 'startColor' => ['rgb' => '10B981']],
-            ],
-        ];
-    }
-
-    public function columnWidths(): array
-    {
-        return [
-            'A' => 22,
-            'B' => 18,
-            'C' => 18,
-            'D' => 18,
-            'E' => 18,
-            'F' => 12,
+            1 => ['font' => ['bold' => true]],
         ];
     }
 }

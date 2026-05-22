@@ -2,36 +2,41 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Member extends Model
 {
-    use HasFactory;
-
     protected $fillable = [
-        'kode_member',
+        'toko_id',
         'nama',
-        'telepon',
         'email',
-        'alamat',
+        'telepon',
         'poin',
         'status',
     ];
 
-    // Auto-generate kode member
-    protected static function boot()
+    protected function casts(): array
     {
-        parent::boot();
-        static::creating(function ($model) {
-            $last = static::latest('id')->first();
-            $number = $last ? ($last->id + 1) : 1;
-            $model->kode_member = 'MBR' . str_pad($number, 4, '0', STR_PAD_LEFT);
-        });
+        return [
+            'poin'   => 'integer',
+            'status' => 'boolean',
+        ];
     }
 
-    public function pointHistories()
+    public function store(): BelongsTo
     {
-    return $this->hasMany(PointHistory::class);
+        return $this->belongsTo(Store::class, 'toko_id');
+    }
+
+    public function transactions(): HasMany
+    {
+        return $this->hasMany(Transaction::class);
+    }
+
+    public function pointHistories(): HasMany
+    {
+        return $this->hasMany(PointHistory::class);
     }
 }

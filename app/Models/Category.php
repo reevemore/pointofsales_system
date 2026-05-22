@@ -2,37 +2,32 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Str;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Category extends Model
 {
-    use HasFactory;
-
     protected $fillable = [
-    'kode',
-    'nama',
-    'kategori_id',
-    'harga_jual',
-    'stok',
-    'foto',
-    'status',
-    // 
-];
+        'toko_id',
+        'nama',
+        'deskripsi',
+        'aktif',
+    ];
 
-    protected static function boot()
+    protected function casts(): array
     {
-        parent::boot();
-        static::creating(function ($model) {
-            $model->slug = Str::slug($model->nama) . '-' . time();
-        });
-        static::updating(function ($model) {
-            $model->slug = Str::slug($model->nama) . '-' . time();
-        });
+        return [
+            'aktif' => 'boolean',
+        ];
     }
 
-    public function products()
+    public function store(): BelongsTo
+    {
+        return $this->belongsTo(Store::class, 'toko_id');
+    }
+
+    public function products(): HasMany
     {
         return $this->hasMany(Product::class);
     }

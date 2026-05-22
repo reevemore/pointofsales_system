@@ -2,14 +2,14 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Product extends Model
 {
-    use HasFactory;
-
     protected $fillable = [
+        'toko_id',
         'category_id',
         'kode_produk',
         'nama',
@@ -22,23 +22,33 @@ class Product extends Model
         'aktif',
     ];
 
-    protected static function boot()
+    protected function casts(): array
     {
-        parent::boot();
-        static::creating(function ($model) {
-            $last = static::latest('id')->first();
-            $number = $last ? ($last->id + 1) : 1;
-            $model->kode_produk = 'PRD' . str_pad($number, 4, '0', STR_PAD_LEFT);
-        });
+        return [
+            'aktif'      => 'boolean',
+            'harga_beli' => 'integer',
+            'harga_jual' => 'integer',
+            'stok'       => 'integer',
+        ];
     }
 
-    public function category()
+    public function store(): BelongsTo
+    {
+        return $this->belongsTo(Store::class, 'toko_id');
+    }
+
+    public function category(): BelongsTo
     {
         return $this->belongsTo(Category::class);
     }
 
-    public function stockMutations()
+    public function stockMutations(): HasMany
     {
         return $this->hasMany(StockMutation::class);
+    }
+
+    public function transactionItems(): HasMany
+    {
+        return $this->hasMany(TransactionItem::class);
     }
 }

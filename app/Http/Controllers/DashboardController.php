@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Controllers\Concerns\HasTokoScope;
 use App\Models\Member;
 use App\Models\Product;
 use App\Models\Transaction;
@@ -10,66 +11,101 @@ use Inertia\Inertia;
 
 class DashboardController extends Controller
 {
+    use HasTokoScope;
+
     public function index()
     {
+        session(['pageTitle' => 'Dashboard', 'pageSubtitle' => 'Ringkasan toko hari ini']);
+
+        $tokoId = $this->tokoId();
+
         // Statistik hari ini
-        $today = today();
+        $today = now()->toDateString();
 
-        $todayTransactions = Transaction::whereDate('created_at', $today)->get();
-        $todayRevenue      = $todayTransactions->sum('total');
-        $todayCount        = $todayTransactions->count();
+        $transaksiHariIni = Transaction::where('toko_id', $tokoId)
+            ->whereDate('created_at', $today)
+            ->where('payment_status', 'paid')
+            ->count();
 
-        // Statistik bulan ini
-        $monthRevenue = Transaction::whereMonth('created_at', now()->month)
-            ->whereYear('created_at', now()->year)
+        $pendapatanHariIni = Transaction::where('toko_id', $tokoId)
+            ->whereDate('created_at', $today)
+            ->where('payment_status', 'paid')
             ->sum('total');
 
-        // Total data
-        $totalProducts = Product::where('aktif', true)->count();
-        $totalMembers  = Member::count();
-        $lowStock      = Product::where('stok', '<=', 5)->where('aktif', true)->count();
+        $totalProduk = Product::where('toko_id', $tokoId)
+            ->where('aktif', true)
+            ->count();
 
-        // Transaksi 7 hari terakhir (untuk grafik)
-        $weeklyData = Transaction::select(
-                DB::raw('DATE(created_at) as date'),
+        $totalMember = Member::where('toko_id', $tokoId)
+            ->where('status', true)
+            ->count();
+
+        $stokMenipis = Product::where('toko_id', $tokoId)
+            ->where('aktif', true)
+            ->where('stok', '<=', 10)
+            ->orderBy('stok')
+            ->limit(5)
+            ->get(['id', 'nama', 'stok', 'satuan']);
+
+        // Grafik 7 hari terakhir
+        $grafikPenjualan = Transaction::where('toko_id', $tokoId)
+            ->where('payment_status', 'paid')
+            ->whereDate('created_at', '>=', now()->subDays(6)->toDateString())
+            ->select(
+                DB::raw('DATE(created_at) as tanggal'),
                 DB::raw('SUM(total) as total'),
-                DB::raw('COUNT(*) as count')
+                DB::raw('COUNT(*) as jumlah')
             )
-            ->whereBetween('created_at', [now()->subDays(6)->startOfDay(), now()->endOfDay()])
-            ->groupBy('date')
-            ->orderBy('date')
+            ->groupBy('tanggal')
+            ->orderBy('tanggal')
             ->get();
 
-        // Produk terlaris
-        $topProducts = DB::table('transaction_items')
-            ->join('products', 'transaction_items.product_id', '=', 'products.id')
-            ->select('products.nama', DB::raw('SUM(transaction_items.qty) as total_qty'))
+        // Transaksi terbaru
+        $transaksiTerbaru = Transaction::where('toko_id', $tokoId)
+            ->with(['member', 'user'])
+            ->where('payment_status', 'paid')
+            ->latest()
+            ->limit(5)
+            ->get()
+            ->map(fn($t) => [
+                'id'           => $t->id,
+                'no_transaksi' => $t->no_transaksi,
+                'total'        => $t->total,
+                'metode_bayar' => $t->metode_bayar,
+                'member'       => $t->member?->nama,
+                'kasir'        => $t->user?->name,
+                'created_at'   => $t->created_at->format('d/m/Y H:i'),
+            ]);
+
+        // Produk terlaris bulan ini
+        $produkTerlaris = DB::table('transaction_items')
+            ->join('products', 'products.id', '=', 'transaction_items.product_id')
+            ->join('transactions', 'transactions.id', '=', 'transaction_items.transaction_id')
+            ->where('transactions.toko_id', $tokoId)
+            ->where('transactions.payment_status', 'paid')
+            ->whereMonth('transactions.created_at', now()->month)
+            ->whereYear('transactions.created_at', now()->year)
+            ->select(
+                'products.nama',
+                DB::raw('SUM(transaction_items.qty) as total_qty'),
+                DB::raw('SUM(transaction_items.subtotal) as total_omzet')
+            )
             ->groupBy('products.id', 'products.nama')
             ->orderByDesc('total_qty')
             ->limit(5)
             ->get();
 
-        // Transaksi terbaru
-        $recentTransactions = Transaction::with(['user', 'member'])
-            ->latest()->limit(5)->get();
-            
-        // Set page title & subtitle
-            session(['pageTitle' => 'Dashboard']);
-            session(['pageSubtitle' => 'Selamat datang kembali']);
-
         return Inertia::render('Dashboard', [
             'stats' => [
-                'today_revenue'  => $todayRevenue,
-                'today_count'    => $todayCount,
-                'month_revenue'  => $monthRevenue,
-                'total_products' => $totalProducts,
-                'total_members'  => $totalMembers,
-                'low_stock'      => $lowStock,
+                'transaksi_hari_ini'  => $transaksiHariIni,
+                'pendapatan_hari_ini' => $pendapatanHariIni,
+                'total_produk'        => $totalProduk,
+                'total_member'        => $totalMember,
             ],
-            'weeklyData'         => $weeklyData,
-            'topProducts'        => $topProducts,
-            'recentTransactions' => $recentTransactions,
+            'stok_menipis'     => $stokMenipis,
+            'grafik_penjualan' => $grafikPenjualan,
+            'transaksi_terbaru'=> $transaksiTerbaru,
+            'produk_terlaris'  => $produkTerlaris,
         ]);
     }
-
 }

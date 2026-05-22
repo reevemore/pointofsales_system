@@ -2,157 +2,155 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Transaction;
 use App\Exports\LaporanExport;
 use App\Exports\LaporanProfitExport;
+use App\Http\Controllers\Concerns\HasTokoScope;
+use App\Models\Transaction;
+use App\Models\Product;
 use Illuminate\Http\Request;
-use Barryvdh\DomPDF\Facade\Pdf;
-use Maatwebsite\Excel\Facades\Excel;
 use Inertia\Inertia;
+use Maatwebsite\Excel\Facades\Excel;
+use Barryvdh\DomPDF\Facade\Pdf;
 
 class LaporanController extends Controller
 {
+    use HasTokoScope;
+
     public function index(Request $request)
     {
-        $from = $request->from ?? today()->toDateString();
-        $to   = $request->to   ?? today()->toDateString();
+        session(['pageTitle' => 'Laporan Penjualan', 'pageSubtitle' => '']);
 
-        $transactions = Transaction::with(['user', 'member', 'items.product'])
-            ->whereDate('created_at', '>=', $from)
-            ->whereDate('created_at', '<=', $to)
-            ->latest()
-            ->get()
-            ->map(function ($trx) {
-                $trx->total   = (float) $trx->total;
-                $trx->bayar   = (float) ($trx->bayar ?? 0);
-                $trx->kembali = (float) ($trx->kembali ?? 0);
-                return $trx;
-            });
+        $query = $this->scopedQuery(Transaction::query())
+            ->with(['items.product', 'member', 'user'])
+            ->where('payment_status', 'paid');
 
-        $total = $transactions->sum('total');
+        if ($request->filled('dari')) {
+            $query->whereDate('created_at', '>=', $request->dari);
+        }
+        if ($request->filled('sampai')) {
+            $query->whereDate('created_at', '<=', $request->sampai);
+        }
+
+        $transactions = $query->latest()->get();
+
+        $summary = [
+            'total_transaksi' => $transactions->count(),
+            'total_pendapatan' => $transactions->sum('total'),
+            'total_diskon'     => $transactions->sum('diskon'),
+        ];
 
         return Inertia::render('Laporan/Index', [
             'transactions' => $transactions,
-            'total'        => (float) $total,
-            'from'         => $from,
-            'to'           => $to,
+            'summary'      => $summary,
+            'filters'      => $request->only(['dari', 'sampai']),
+        ]);
+    }
+
+    public function profit(Request $request)
+    {
+        session(['pageTitle' => 'Laporan Profit', 'pageSubtitle' => '']);
+
+        $query = $this->scopedQuery(Transaction::query())
+            ->with(['items.product'])
+            ->where('payment_status', 'paid');
+
+        if ($request->filled('dari')) {
+            $query->whereDate('created_at', '>=', $request->dari);
+        }
+        if ($request->filled('sampai')) {
+            $query->whereDate('created_at', '<=', $request->sampai);
+        }
+
+        $transactions = $query->latest()->get();
+
+        // Hitung profit per transaksi
+        $data = $transactions->map(function ($trx) {
+            $hpp = $trx->items->sum(fn($item) => $item->product->harga_beli * $item->qty);
+            return [
+                'id'           => $trx->id,
+                'no_transaksi' => $trx->no_transaksi,
+                'total'        => $trx->total,
+                'hpp'          => $hpp,
+                'profit'       => $trx->total - $hpp,
+                'created_at'   => $trx->created_at,
+            ];
+        });
+
+        $summary = [
+            'total_pendapatan' => $data->sum('total'),
+            'total_hpp'        => $data->sum('hpp'),
+            'total_profit'     => $data->sum('profit'),
+        ];
+
+        return Inertia::render('Laporan/Profit', [
+            'data'    => $data,
+            'summary' => $summary,
+            'filters' => $request->only(['dari', 'sampai']),
         ]);
     }
 
     public function exportPdf(Request $request)
     {
-        $from = $request->from ?? today()->toDateString();
-        $to   = $request->to   ?? today()->toDateString();
+        $query = $this->scopedQuery(Transaction::query())
+            ->with(['items.product', 'member'])
+            ->where('payment_status', 'paid');
 
-        $transactions = Transaction::with(['user', 'member', 'items.product'])
-            ->whereDate('created_at', '>=', $from)
-            ->whereDate('created_at', '<=', $to)
-            ->latest()
-            ->get()
-            ->map(function ($trx) {
-                $trx->total   = (float) $trx->total;
-                $trx->bayar   = (float) ($trx->bayar ?? 0);
-                $trx->kembali = (float) ($trx->kembali ?? 0);
-                return $trx;
-            });
+        if ($request->filled('dari')) {
+            $query->whereDate('created_at', '>=', $request->dari);
+        }
+        if ($request->filled('sampai')) {
+            $query->whereDate('created_at', '<=', $request->sampai);
+        }
 
-        $total = (float) $transactions->sum('total');
+        $transactions = $query->latest()->get();
 
-        $pdf = Pdf::loadView('laporan.pdf', compact('transactions', 'total', 'from', 'to'))
-            ->setPaper('a4', 'landscape');
-
-        return $pdf->download("laporan-{$from}-sd-{$to}.pdf");
+        $pdf = Pdf::loadView('laporan.pdf', compact('transactions'));
+        return $pdf->download('laporan-penjualan.pdf');
     }
 
     public function exportExcel(Request $request)
     {
-        $from = $request->from ?? today()->toDateString();
-        $to   = $request->to   ?? today()->toDateString();
-        return Excel::download(new LaporanExport($from, $to), "laporan-{$from}-sd-{$to}.xlsx");
-    }
+        $filters = $request->only(['dari', 'sampai']);
+        $tokoId  = $this->tokoId();
 
-    public function profit(Request $request)
-    {
-        $from = $request->from ?? today()->toDateString();
-        $to   = $request->to   ?? today()->toDateString();
-
-        $transactions = Transaction::with(['items.product'])
-            ->whereDate('created_at', '>=', $from)
-            ->whereDate('created_at', '<=', $to)
-            ->where('payment_status', 'paid')
-            ->latest()
-            ->get();
-
-        $profitData = $transactions->map(function ($trx) {
-            $modalTotal = $trx->items->sum(function ($item) {
-                return ($item->product->harga_beli ?? 0) * $item->qty;
-            });
-            $profit = $trx->total - $modalTotal;
-
-            return [
-                'id'           => $trx->id,
-                'no_transaksi' => $trx->no_transaksi,
-                'created_at'   => $trx->created_at,
-                'total'        => $trx->total,
-                'modal'        => $modalTotal,
-                'profit'       => $profit,
-                'margin'       => $trx->total > 0
-                                    ? round(($profit / $trx->total) * 100, 1)
-                                    : 0,
-            ];
-        });
-
-        return Inertia::render('Laporan/Profit', [
-            'profitData'  => $profitData,
-            'totalOmzet'  => $profitData->sum('total'),
-            'totalModal'  => $profitData->sum('modal'),
-            'totalProfit' => $profitData->sum('profit'),
-            'from'        => $from,
-            'to'          => $to,
-        ]);
+        return Excel::download(new LaporanExport($filters, $tokoId), 'laporan-penjualan.xlsx');
     }
 
     public function profitExportExcel(Request $request)
     {
-        $from = $request->from ?? today()->toDateString();
-        $to   = $request->to   ?? today()->toDateString();
-        return Excel::download(new LaporanProfitExport($from, $to), "profit-{$from}-sd-{$to}.xlsx");
+        $filters = $request->only(['dari', 'sampai']);
+        $tokoId  = $this->tokoId();
+
+        return Excel::download(new LaporanProfitExport($filters, $tokoId), 'laporan-profit.xlsx');
     }
 
     public function profitExportPdf(Request $request)
     {
-        $from = $request->from ?? today()->toDateString();
-        $to   = $request->to   ?? today()->toDateString();
+        $query = $this->scopedQuery(Transaction::query())
+            ->with(['items.product'])
+            ->where('payment_status', 'paid');
 
-        $transactions = Transaction::with(['items.product'])
-            ->whereDate('created_at', '>=', $from)
-            ->whereDate('created_at', '<=', $to)
-            ->where('payment_status', 'paid')
-            ->latest()
-            ->get();
+        if ($request->filled('dari')) {
+            $query->whereDate('created_at', '>=', $request->dari);
+        }
+        if ($request->filled('sampai')) {
+            $query->whereDate('created_at', '<=', $request->sampai);
+        }
 
-        $profitData = $transactions->map(function ($trx) {
-            $modal  = $trx->items->sum(fn($i) => ($i->product->harga_beli ?? 0) * $i->qty);
-            $profit = $trx->total - $modal;
+        $transactions = $query->latest()->get();
+
+        $data = $transactions->map(function ($trx) {
+            $hpp = $trx->items->sum(fn($item) => $item->product->harga_beli * $item->qty);
             return [
                 'no_transaksi' => $trx->no_transaksi,
-                'created_at'   => $trx->created_at,
                 'total'        => $trx->total,
-                'modal'        => $modal,
-                'profit'       => $profit,
-                'margin'       => $trx->total > 0 ? round(($profit / $trx->total) * 100, 1) : 0,
+                'hpp'          => $hpp,
+                'profit'       => $trx->total - $hpp,
+                'created_at'   => $trx->created_at,
             ];
         });
 
-        $pdf = Pdf::loadView('laporan.profit-pdf', [
-            'profitData'  => $profitData,
-            'totalOmzet'  => $profitData->sum('total'),
-            'totalModal'  => $profitData->sum('modal'),
-            'totalProfit' => $profitData->sum('profit'),
-            'from'        => $from,
-            'to'          => $to,
-        ])->setPaper('a4', 'landscape');
-
-        return $pdf->download("profit-{$from}-sd-{$to}.pdf");
+        $pdf = Pdf::loadView('laporan.profit-pdf', compact('data'));
+        return $pdf->download('laporan-profit.pdf');
     }
 }

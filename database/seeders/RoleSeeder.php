@@ -2,33 +2,19 @@
 
 namespace Database\Seeders;
 
-use App\Models\User;
 use Illuminate\Database\Seeder;
-use Illuminate\Support\Facades\Hash;
 use Spatie\Permission\Models\Role;
 
 class RoleSeeder extends Seeder
 {
     public function run(): void
     {
-        // Buat role
-        $admin  = Role::firstOrCreate(['name' => 'admin']);
-        $kasir  = Role::firstOrCreate(['name' => 'kasir']);
+        // Reset cache role & permission
+        app()[\Spatie\Permission\PermissionRegistrar::class]->forgetCachedPermissions();
 
-        // User rudy (yang sudah ada) jadi admin
-        $user = User::where('email', 'admin@admin.com')->first();
-        if ($user) {
-            $user->assignRole('admin');
-        }
-
-        // Buat akun kasir contoh
-        $kasirUser = User::firstOrCreate(
-            ['email' => 'kasir@kasir.com'],
-            [
-                'name'     => 'Kasir',
-                'password' => Hash::make('password'),
-            ]
-        );
-        $kasirUser->assignRole('kasir');
+        // Buat semua role jika belum ada
+        Role::firstOrCreate(['name' => 'superadmin', 'guard_name' => 'web']);
+        Role::firstOrCreate(['name' => 'admin',      'guard_name' => 'web']);
+        Role::firstOrCreate(['name' => 'kasir',      'guard_name' => 'web']);
     }
 }
