@@ -40,27 +40,25 @@ class TransactionController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'items'          => 'required|array|min:1',
+            'items'              => 'required|array|min:1',
             'items.*.product_id' => 'required|exists:products,id',
-            'items.*.qty'    => 'required|integer|min:1',
-            'items.*.harga'  => 'required|integer|min:0',
-            'member_id'      => 'nullable|exists:members,id',
-            'diskon'         => 'nullable|integer|min:0',
-            'bayar'          => 'required|integer|min:0',
-            'metode_bayar'   => 'required|in:tunai,transfer,qris',
-            'payment_status' => 'nullable|string',
+            'items.*.qty'        => 'required|integer|min:1',
+            'items.*.harga'      => 'required|integer|min:0',
+            'member_id'          => 'nullable|exists:members,id',
+            'diskon'             => 'nullable|integer|min:0',
+            'bayar'              => 'required|integer|min:0',
+            'metode_bayar'       => 'required|in:tunai,transfer,qris',
+            'payment_status'     => 'nullable|string',
         ]);
 
         $tokoId = $this->tokoId();
 
-        // Validasi semua produk milik toko ini
         $productIds = collect($request->items)->pluck('product_id');
         $invalidProduct = Product::whereIn('id', $productIds)
             ->where('toko_id', '!=', $tokoId)
             ->exists();
         abort_if($invalidProduct, 403, 'Produk tidak valid untuk toko ini.');
 
-        // Validasi member milik toko ini
         if ($request->member_id) {
             $member = Member::find($request->member_id);
             abort_if($member->toko_id !== $tokoId, 403, 'Member tidak valid untuk toko ini.');
@@ -72,7 +70,6 @@ class TransactionController extends Controller
             $total    = $subtotal - $diskon;
             $kembali  = $request->bayar - $total;
 
-            // Buat transaksi
             $transaction = Transaction::create([
                 'toko_id'        => $tokoId,
                 'no_transaksi'   => 'TRX-' . strtoupper(uniqid()),
@@ -88,7 +85,6 @@ class TransactionController extends Controller
                 'payment_status' => $request->payment_status ?? 'paid',
             ]);
 
-            // Simpan items + update stok
             foreach ($request->items as $item) {
                 $product = Product::find($item['product_id']);
 
@@ -100,24 +96,23 @@ class TransactionController extends Controller
                     'subtotal'       => $item['harga'] * $item['qty'],
                 ]);
 
-                // Kurangi stok
                 $product->decrement('stok', $item['qty']);
 
-                // Catat mutasi stok
                 StockMutation::create([
-                    'toko_id'    => $tokoId,
-                    'product_id' => $product->id,
-                    'user_id'    => auth()->id(),
-                    'type'       => 'out',
-                    'qty'        => $item['qty'],
-                    'keterangan' => 'Penjualan #' . $transaction->no_transaksi,
+                    'toko_id'      => $tokoId,
+                    'product_id'   => $product->id,
+                    'user_id'      => auth()->id(),
+                    'type'         => 'out',
+                    'qty'          => $item['qty'],
+                    'stok_before'  => $product->stok + $item['qty'], // stok sebelum dikurangi
+                    'stok_after'   => $product->stok,               // stok sesudah dikurangi
+                    'keterangan'   => 'Penjualan #' . $transaction->no_transaksi,
                 ]);
             }
 
-            // Tambah poin member jika ada
             if ($request->member_id) {
-                $member    = Member::find($request->member_id);
-                $poinBaru  = (int) floor($total / config('poin.rupiah_per_poin', 10000));
+                $member   = Member::find($request->member_id);
+                $poinBaru = (int) floor($total / config('poin.rupiah_per_poin', 10000));
 
                 if ($poinBaru > 0) {
                     $poinBefore = $member->poin;
@@ -138,29 +133,41 @@ class TransactionController extends Controller
             return $transaction;
         });
 
-        return redirect()->route('pos.receipt', $transaction->id)
+        $transaction->load(['items.product', 'member', 'user']);
+        return redirect()->route('pos.index')
+            ->with('transaction', $transaction)
             ->with('success', 'Transaksi berhasil disimpan.');
     }
 
+    // Receipt / struk setelah transaksi
     public function show(Transaction $transaction)
     {
         abort_if($transaction->toko_id !== $this->tokoId(), 403);
 
-        $transaction->load(['items.product', 'member', 'user']);
+        $transaction->load(['items.product', 'member', 'user', 'user.store']);
 
-        return Inertia::render('POS/History', [
+        return Inertia::render('POS/Receipt', [
             'transaction' => $transaction,
         ]);
     }
 
-    public function history()
+    // Riwayat transaksi (paginated + search)
+    public function history(Request $request)
     {
         session(['pageTitle' => 'Riwayat Transaksi', 'pageSubtitle' => '']);
 
-        $transactions = $this->scopedQuery(Transaction::query())
+        $query = $this->scopedQuery(Transaction::query())
             ->with(['member', 'user', 'items'])
-            ->latest()
-            ->get();
+            ->latest();
+
+        if ($request->filled('search')) {
+            $query->where('no_transaksi', 'like', '%' . $request->search . '%');
+        }
+        if ($request->filled('metode')) {
+            $query->where('metode_bayar', $request->metode);
+        }
+
+        $transactions = $query->paginate(15)->withQueryString();
 
         return Inertia::render('POS/History', [
             'transactions' => $transactions,

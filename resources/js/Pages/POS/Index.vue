@@ -503,7 +503,7 @@ function handleTransfer({ orderId, pending }) { simpanTransaksi('transfer', { mi
 function handleQris({ orderId }) { simpanTransaksi('qris', { midtrans_order_id: orderId, payment_status: 'paid' }) }
 
 function simpanTransaksi(paymentMethod = 'tunai', extraData = {}) {
-    form.items             = cart.value.map(i => ({ product_id: i.id, qty: i.qty }))
+    form.items             = cart.value.map(i => ({ product_id: i.id, qty: i.qty, harga: i.harga_jual }))
     form.payment_method    = paymentMethod
     form.metode_bayar      = paymentMethod
     form.midtrans_order_id = extraData.midtrans_order_id ?? null
@@ -511,11 +511,15 @@ function simpanTransaksi(paymentMethod = 'tunai', extraData = {}) {
 
     form.post(route('pos.store'), {
         onSuccess: () => {
-            resetTransaction()
-            const trx = page.props.flash?.transaction
-            if (trx) receipt.value = trx
             showPaymentModal.value = false
-            if (paymentMethod === 'tunai') printStruk()
+            const trx = page.props.flash?.transaction
+            if (trx) {
+                receipt.value = trx
+                if (paymentMethod === 'tunai') {
+                    setTimeout(() => printStruk(), 150)
+                }
+            }
+            resetTransaction()
         }
     })
 }
@@ -533,7 +537,6 @@ function resetTransaction() {
 const printStruk = () => {
     const content = document.getElementById('struk')?.innerHTML
     if (!content) return
-    receipt.value = null
     const win = window.open('', '_blank', 'width=400,height=600')
     win.document.write(`<html><head><title>Struk</title><style>body{font-family:monospace;font-size:12px;padding:16px}.d-flex{display:flex}.justify-content-between{justify-content:space-between}.text-center{text-align:center}.fw-bold,.fw-bolder{font-weight:bold}.text-muted{color:#888}.text-danger{color:#f1416c}.text-success{color:#50cd89}.separator{border-top:1px dashed #ccc;margin:8px 0}.mb-1{margin-bottom:4px}.mb-2{margin-bottom:8px}.mb-3{margin-bottom:12px}.mb-4{margin-bottom:16px}.my-3{margin:12px 0}.fs-4{font-size:16px}.fs-5{font-size:14px}.fs-7{font-size:12px}.fs-8{font-size:11px}</style></head><body>${content}</body></html>`)
     win.document.close()

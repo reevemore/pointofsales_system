@@ -22,8 +22,11 @@ class StockController extends Controller
             ->latest()
             ->get();
 
+        $lowStock = $products->filter(fn($p) => $p->stok <= 10)->values();
+
         return Inertia::render('Stock/Index', [
             'products' => $products,
+            'lowStock' => $lowStock,
         ]);
     }
 
@@ -49,13 +52,20 @@ class StockController extends Controller
             }
 
             // Catat mutasi stok
+            $stokBefore = $product->stok;
+            $stokAfter  = $request->type === 'in'
+                ? $stokBefore + $request->qty
+                : $stokBefore - $request->qty;
+
             StockMutation::create([
-                'toko_id'    => $this->tokoId(),
-                'product_id' => $product->id,
-                'user_id'    => auth()->id(),
-                'type'       => $request->type,
-                'qty'        => $request->qty,
-                'keterangan' => $request->keterangan,
+                'toko_id'     => $this->tokoId(),
+                'product_id'  => $product->id,
+                'user_id'     => auth()->id(),
+                'type'        => $request->type,
+                'qty'         => $request->qty,
+                'stok_before' => $stokBefore,
+                'stok_after'  => $stokAfter,
+                'keterangan'  => $request->keterangan,
             ]);
         });
 

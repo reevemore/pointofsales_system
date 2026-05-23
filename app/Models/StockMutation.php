@@ -13,6 +13,8 @@ class StockMutation extends Model
         'user_id',
         'type',
         'qty',
+        'stok_before', // <-- Tambahkan ini jika belum ada
+        'stok_after',  // <-- Tambahkan ini jika belum ada
         'keterangan',
     ];
 

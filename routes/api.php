@@ -1,7 +1,6 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\ProductController;
 
-// Tanpa middleware auth — cukup untuk internal POS yang sudah login via web session
-Route::get('/products/by-kode/{kode}', [ProductController::class, 'byKode']);
+// Route API dipindahkan ke web.php agar bisa pakai web session (auth)
+// File ini sengaja dikosongkan - lihat routes/web.php

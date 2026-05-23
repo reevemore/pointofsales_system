@@ -44,7 +44,7 @@ class ProductController extends Controller
     {
         $request->validate([
             'category_id' => 'required|exists:categories,id',
-            'kode_produk' => 'required|string|max:50|unique:products,kode_produk',
+            'kode_produk' => 'nullable|string|max:50|unique:products,kode_produk',
             'nama'        => 'required|string|max:255',
             'deskripsi'   => 'nullable|string',
             'foto'        => 'nullable|image|max:2048',
@@ -63,6 +63,19 @@ class ProductController extends Controller
             403
         );
 
+        // Auto-generate kode_produk jika tidak diisi
+        $kodeProduk = $request->kode_produk;
+        if (!$kodeProduk) {
+            $lastProduct = Product::where('toko_id', $this->tokoId())
+                ->orderByDesc('id')->first();
+            $nextNum = $lastProduct ? (intval(substr($lastProduct->kode_produk, -4)) + 1) : 1;
+            $kodeProduk = 'PRD-' . str_pad($nextNum, 4, '0', STR_PAD_LEFT);
+            while (Product::where('kode_produk', $kodeProduk)->exists()) {
+                $nextNum++;
+                $kodeProduk = 'PRD-' . str_pad($nextNum, 4, '0', STR_PAD_LEFT);
+            }
+        }
+
         $fotoPath = null;
         if ($request->hasFile('foto')) {
             $fotoPath = $request->file('foto')->store('products', 'public');
@@ -71,7 +84,7 @@ class ProductController extends Controller
         Product::create([
             'toko_id'     => $this->tokoId(),
             'category_id' => $request->category_id,
-            'kode_produk' => $request->kode_produk,
+            'kode_produk' => $kodeProduk,
             'nama'        => $request->nama,
             'deskripsi'   => $request->deskripsi,
             'foto'        => $fotoPath,
@@ -128,7 +141,6 @@ class ProductController extends Controller
 
         $fotoPath = $product->foto;
         if ($request->hasFile('foto')) {
-            // Hapus foto lama
             if ($product->foto) {
                 Storage::disk('public')->delete($product->foto);
             }
@@ -164,5 +176,48 @@ class ProductController extends Controller
 
         return redirect()->route('products.index')
             ->with('success', 'Produk berhasil dihapus.');
+    }
+
+    /**
+     * API: Cari produk berdasarkan kode (untuk scanner barcode di POS)
+     * Mendukung: PRD-0001, PRD0001, prd0001 (case-insensitive, strip dash/spasi)
+     */
+    public function byKode(string $kode)
+    {
+        $kode = trim(str_replace(["\n", "\r", "\t"], '', $kode));
+
+        // Exact match
+        $product = $this->scopedQuery(Product::query())
+            ->with('category')
+            ->where('aktif', true)
+            ->where('kode_produk', $kode)
+            ->first();
+
+        // Case-insensitive
+        if (!$product) {
+            $product = $this->scopedQuery(Product::query())
+                ->with('category')
+                ->where('aktif', true)
+                ->whereRaw('LOWER(kode_produk) = ?', [strtolower($kode)])
+                ->first();
+        }
+
+        // Strip dash/spasi lalu compare
+        if (!$product) {
+            $kodeStripped = strtolower(preg_replace('/[\s\-_]/', '', $kode));
+            $product = $this->scopedQuery(Product::query())
+                ->with('category')
+                ->where('aktif', true)
+                ->get()
+                ->first(function ($p) use ($kodeStripped) {
+                    return strtolower(preg_replace('/[\s\-_]/', '', $p->kode_produk)) === $kodeStripped;
+                });
+        }
+
+        if (!$product) {
+            return response()->json(['product' => null], 404);
+        }
+
+        return response()->json(['product' => $product]);
     }
 }

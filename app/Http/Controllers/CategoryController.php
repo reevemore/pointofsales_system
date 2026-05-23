@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Controllers\Concerns\HasTokoScope;
 use App\Models\Category;
 use Illuminate\Http\Request;
+use Illuminate\Support\Str;
 use Inertia\Inertia;
 
 class CategoryController extends Controller
@@ -42,6 +43,7 @@ class CategoryController extends Controller
         Category::create([
             'toko_id'   => $this->tokoId(),
             'nama'      => $request->nama,
+            'slug'      => Str::slug($request->nama) . '-' . uniqid(),
             'deskripsi' => $request->deskripsi,
             'aktif'     => $request->aktif ?? true,
         ]);
@@ -74,6 +76,7 @@ class CategoryController extends Controller
 
         $category->update([
             'nama'      => $request->nama,
+            'slug'      => Str::slug($request->nama) . '-' . $category->id,
             'deskripsi' => $request->deskripsi,
             'aktif'     => $request->aktif ?? true,
         ]);

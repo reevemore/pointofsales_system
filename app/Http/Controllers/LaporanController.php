@@ -54,38 +54,38 @@ class LaporanController extends Controller
             ->with(['items.product'])
             ->where('payment_status', 'paid');
 
-        if ($request->filled('dari')) {
-            $query->whereDate('created_at', '>=', $request->dari);
+        if ($request->filled('from') || $request->filled('dari')) {
+            $query->whereDate('created_at', '>=', $request->from ?? $request->dari);
         }
-        if ($request->filled('sampai')) {
-            $query->whereDate('created_at', '<=', $request->sampai);
+        if ($request->filled('to') || $request->filled('sampai')) {
+            $query->whereDate('created_at', '<=', $request->to ?? $request->sampai);
         }
 
         $transactions = $query->latest()->get();
 
         // Hitung profit per transaksi
         $data = $transactions->map(function ($trx) {
-            $hpp = $trx->items->sum(fn($item) => $item->product->harga_beli * $item->qty);
+            $hpp = $trx->items->sum(fn($item) => ($item->product->harga_beli ?? 0) * $item->qty);
+            $profit = $trx->total - $hpp;
+            $margin = $trx->total > 0 ? round($profit / $trx->total * 100, 1) : 0;
             return [
                 'id'           => $trx->id,
                 'no_transaksi' => $trx->no_transaksi,
                 'total'        => $trx->total,
-                'hpp'          => $hpp,
-                'profit'       => $trx->total - $hpp,
+                'modal'        => $hpp,
+                'profit'       => $profit,
+                'margin'       => $margin,
                 'created_at'   => $trx->created_at,
             ];
         });
 
-        $summary = [
-            'total_pendapatan' => $data->sum('total'),
-            'total_hpp'        => $data->sum('hpp'),
-            'total_profit'     => $data->sum('profit'),
-        ];
-
         return Inertia::render('Laporan/Profit', [
-            'data'    => $data,
-            'summary' => $summary,
-            'filters' => $request->only(['dari', 'sampai']),
+            'profitData'  => $data->values(),
+            'totalOmzet'  => $data->sum('total'),
+            'totalModal'  => $data->sum('modal'),
+            'totalProfit' => $data->sum('profit'),
+            'from'        => $request->from ?? $request->dari ?? now()->startOfMonth()->format('Y-m-d'),
+            'to'          => $request->to   ?? $request->sampai ?? now()->format('Y-m-d'),
         ]);
     }
 

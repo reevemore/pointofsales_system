@@ -125,8 +125,9 @@ const page = usePage()
 const search = ref('')
 
 const filteredCategories = computed(() => {
-    if (!search.value) return props.categories.data
-    return props.categories.data.filter(c =>
+    const list = Array.isArray(props.categories) ? props.categories : (props.categories?.data ?? [])
+    if (!search.value) return list
+    return list.filter(c =>
         c.nama.toLowerCase().includes(search.value.toLowerCase())
     )
 })

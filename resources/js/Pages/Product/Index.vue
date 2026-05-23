@@ -149,8 +149,9 @@ const page = usePage()
 const search = ref('')
 
 const filteredProducts = computed(() => {
-    if (!search.value) return props.products.data
-    return props.products.data.filter(p =>
+    const list = Array.isArray(props.products) ? props.products : (props.products?.data ?? [])
+    if (!search.value) return list
+    return list.filter(p =>
         p.nama.toLowerCase().includes(search.value.toLowerCase()) ||
         p.kode_produk.toLowerCase().includes(search.value.toLowerCase())
     )

@@ -114,8 +114,9 @@ const page = usePage()
 const search = ref('')
 
 const filteredMembers = computed(() => {
-    if (!search.value) return props.members.data
-    return props.members.data.filter(m =>
+    const list = Array.isArray(props.members) ? props.members : (props.members?.data ?? [])
+    if (!search.value) return list
+    return list.filter(m =>
         m.nama.toLowerCase().includes(search.value.toLowerCase()) ||
         m.kode_member.toLowerCase().includes(search.value.toLowerCase())
     )

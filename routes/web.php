@@ -126,3 +126,11 @@ Route::post('payment/notification', [PaymentController::class, 'notification'])
     ->name('payment.notification');
 
 require __DIR__.'/auth.php';
+/*
+|--------------------------------------------------------------------------
+| Internal API Routes (pakai web session, bukan sanctum token)
+|--------------------------------------------------------------------------
+*/
+Route::middleware(['auth'])->group(function () {
+    Route::get('/api/products/by-kode/{kode}', [\App\Http\Controllers\ProductController::class, 'byKode']);
+});

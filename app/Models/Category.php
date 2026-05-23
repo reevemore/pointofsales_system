@@ -11,6 +11,7 @@ class Category extends Model
     protected $fillable = [
         'toko_id',
         'nama',
+        'slug',
         'deskripsi',
         'aktif',
     ];
