@@ -17,7 +17,7 @@
 
             <div class="left-content">
                 <div class="left-badge">Point of Sale System</div>
-                <h2 class="left-title"><br>Aplikasi kami</h2>
+                <h2 class="left-title"><br>Aplikasi kami Membantu Mengelola Toko</h2>
                 <p class="left-desc">Platform manajemen penjualan lengkap untuk bisnis Anda. Pantau pendapatan, stok, dan transaksi dalam satu tempat.</p>
 
                 <div class="stat-row">

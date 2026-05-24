@@ -191,21 +191,20 @@ class StoreController extends Controller
     }
 
     /**
-     * Hapus toko (soft delete — nonaktifkan saja, tidak hapus data)
+     * Hapus toko beserta semua user yang terhubung
      */
     public function destroy(Store $store)
     {
-        // Cegah hapus toko yang masih aktif punya user
-        $userCount = $store->users()->count();
-        if ($userCount > 0) {
-            return redirect()->route('stores.index')
-                ->with('error', "Toko tidak bisa dihapus karena masih memiliki {$userCount} user aktif. Nonaktifkan toko terlebih dahulu.");
-        }
+        DB::transaction(function () use ($store) {
+            // Hapus semua user yang terhubung ke toko ini
+            $store->users()->delete();
 
-        $store->delete();
+            // Hapus toko
+            $store->delete();
+        });
 
         return redirect()->route('stores.index')
-            ->with('success', 'Toko berhasil dihapus.');
+            ->with('success', "Toko {$store->nama} beserta semua user-nya berhasil dihapus.");
     }
 
     /**

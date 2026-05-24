@@ -1,6 +1,6 @@
 <script setup>
-import { ref } from 'vue'
-import { router, usePage, Link } from '@inertiajs/vue3'
+import { ref, computed } from 'vue'
+import { router, usePage, Link, Head } from '@inertiajs/vue3'
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue'
 import { useSwal } from '@/Composables/useSwal'
 
@@ -8,34 +8,40 @@ const props = defineProps({
     stores: Array,
 })
 
-const { confirmDelete, toast } = useSwal()
+const { confirmDelete, showSuccess } = useSwal()
 const page = usePage()
-const flash = page.props.flash
+const flash = computed(() => page.props.flash)
 
 const handleToggle = (store) => {
     router.patch(route('stores.toggle', store.id), {}, {
         preserveScroll: true,
-        onSuccess: () => toast(
-            store.aktif ? 'Toko dinonaktifkan' : 'Toko diaktifkan',
-            'success'
+        onSuccess: () => showSuccess(
+            store.aktif ? 'Toko berhasil dinonaktifkan.' : 'Toko berhasil diaktifkan.'
         ),
     })
 }
 
 const handleDelete = async (store) => {
-    const confirmed = await confirmDelete(
-        `Hapus toko "${store.nama}"?`,
-        'Toko hanya bisa dihapus jika tidak memiliki user aktif.'
+    const result = await confirmDelete(
+        store.nama,
+        'toko (hanya bisa dihapus jika tidak memiliki user aktif)'
     )
-    if (confirmed) {
+    if (result.isConfirmed) {
         router.delete(route('stores.destroy', store.id), {
             preserveScroll: true,
+            onSuccess: () => {
+                const currentFlash = page.props.flash
+                if (!currentFlash?.error) {
+                    showSuccess(`Toko ${store.nama} berhasil dihapus.`)
+                }
+            },
         })
     }
 }
 </script>
 
 <template>
+    <Head title="Manajemen Toko" />
     <AuthenticatedLayout>
         <!-- Flash Messages -->
         <div v-if="flash.success" class="alert alert-success d-flex align-items-center mb-5">

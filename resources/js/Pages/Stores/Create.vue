@@ -1,5 +1,5 @@
 <script setup>
-import { useForm } from '@inertiajs/vue3'
+import { useForm, Link, Head } from '@inertiajs/vue3'
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue'
 
 const form = useForm({
@@ -23,12 +23,13 @@ const submit = () => {
 </script>
 
 <template>
+    <Head title="Tambah Toko" />
     <AuthenticatedLayout>
         <!-- Breadcrumb -->
         <div class="d-flex align-items-center gap-2 mb-6">
-            <a :href="route('stores.index')" class="text-muted text-hover-primary fs-6">
+            <Link :href="route('stores.index')" class="text-muted text-hover-primary fs-6">
                 Manajemen Toko
-            </a>
+            </Link>
             <i class="ki-duotone ki-right fs-6 text-muted"></i>
             <span class="text-gray-900 fs-6 fw-semibold">Tambah Toko</span>
         </div>
@@ -210,12 +211,12 @@ const submit = () => {
 
         <!-- Action Buttons -->
         <div class="d-flex justify-content-end gap-3 mt-6">
-            <a :href="route('stores.index')" class="btn btn-light">
+            <Link :href="route('stores.index')" class="btn btn-light">
                 <i class="ki-duotone ki-arrow-left fs-4 me-1">
                     <span class="path1"></span><span class="path2"></span>
                 </i>
                 Batal
-            </a>
+            </Link>
             <button
                 @click="submit"
                 class="btn btn-primary"
