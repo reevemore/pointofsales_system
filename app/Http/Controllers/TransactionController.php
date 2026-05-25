@@ -121,7 +121,7 @@ class TransactionController extends Controller
                     PointHistory::create([
                         'member_id'      => $member->id,
                         'transaction_id' => $transaction->id,
-                        'type'           => 'in',
+                        'type'           => 'earn',
                         'poin'           => $poinBaru,
                         'poin_before'    => $poinBefore,
                         'poin_after'     => $poinBefore + $poinBaru,

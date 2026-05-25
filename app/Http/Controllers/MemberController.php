@@ -37,16 +37,29 @@ class MemberController extends Controller
             'nama'    => 'required|string|max:255',
             'email'   => 'nullable|email|max:255',
             'telepon' => 'nullable|string|max:20',
-            'status'  => 'boolean',
+            'alamat'  => 'nullable|string|max:500',
+            'status'  => 'required|in:aktif,nonaktif',
         ]);
 
+        // Auto-generate kode_member
+        $lastMember = Member::where('toko_id', $this->tokoId())
+            ->orderByDesc('id')->first();
+        $nextNum = $lastMember ? (intval(substr($lastMember->kode_member, -4)) + 1) : 1;
+        $kodeMember = 'MBR-' . str_pad($nextNum, 4, '0', STR_PAD_LEFT);
+        while (Member::where('kode_member', $kodeMember)->exists()) {
+            $nextNum++;
+            $kodeMember = 'MBR-' . str_pad($nextNum, 4, '0', STR_PAD_LEFT);
+        }
+
         Member::create([
-            'toko_id' => $this->tokoId(),
-            'nama'    => $request->nama,
-            'email'   => $request->email,
-            'telepon' => $request->telepon,
-            'poin'    => 0,
-            'status'  => $request->status ?? true,
+            'toko_id'     => $this->tokoId(),
+            'kode_member' => $kodeMember,
+            'nama'        => $request->nama,
+            'email'       => $request->email,
+            'telepon'     => $request->telepon,
+            'alamat'      => $request->alamat,
+            'poin'        => 0,
+            'status'      => $request->status,
         ]);
 
         return redirect()->route('members.index')
@@ -72,14 +85,16 @@ class MemberController extends Controller
             'nama'    => 'required|string|max:255',
             'email'   => 'nullable|email|max:255',
             'telepon' => 'nullable|string|max:20',
-            'status'  => 'boolean',
+            'alamat'  => 'nullable|string|max:500',
+            'status'  => 'required|in:aktif,nonaktif',
         ]);
 
         $member->update([
             'nama'    => $request->nama,
             'email'   => $request->email,
             'telepon' => $request->telepon,
-            'status'  => $request->status ?? true,
+            'alamat'  => $request->alamat,
+            'status'  => $request->status,
         ]);
 
         return redirect()->route('members.index')

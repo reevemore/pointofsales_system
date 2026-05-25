@@ -1,6 +1,6 @@
 <script setup>
-import { computed } from 'vue'
-import { Link, usePage } from '@inertiajs/vue3'
+import { computed, watch, nextTick } from 'vue'
+import { Link, usePage, router } from '@inertiajs/vue3'
 
 const props = defineProps({
     collapsed: Boolean,
@@ -22,6 +22,24 @@ const isActive = (components) => {
     if (Array.isArray(components)) return components.includes(page.component)
     return page.component === components
 }
+
+// Auto-scroll sidebar ke active menu item setiap navigasi
+const scrollToActive = () => {
+    nextTick(() => {
+        const wrapper = document.getElementById('kt_app_sidebar_menu_wrapper')
+        const activeLink = document.querySelector('#kt_app_sidebar_menu .menu-link.active')
+        if (wrapper && activeLink) {
+            const wrapperTop = wrapper.getBoundingClientRect().top
+            const activeTop  = activeLink.getBoundingClientRect().top
+            const offset     = activeTop - wrapperTop + wrapper.scrollTop - (wrapper.clientHeight / 2) + (activeLink.clientHeight / 2)
+            wrapper.scrollTo({ top: offset, behavior: 'instant' })
+        }
+    })
+}
+
+// Jalankan saat pertama kali load dan setiap navigasi selesai
+router.on('finish', () => scrollToActive())
+scrollToActive()
 </script>
 
 <template>

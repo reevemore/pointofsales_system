@@ -77,11 +77,12 @@
                                     </td>
                                     <td class="text-muted">{{ user.email }}</td>
                                     <td>
-                                        <span v-for="role in user.roles" :key="role.id"
+                                        <span v-if="user.role"
                                             class="badge me-1 fw-bold"
-                                            :class="role.name === 'admin' ? 'badge-light-danger' : 'badge-light-primary'">
-                                            {{ role.name.toUpperCase() }}
+                                            :class="user.role === 'admin' ? 'badge-light-danger' : 'badge-light-primary'">
+                                            {{ user.role.toUpperCase() }}
                                         </span>
+                                        <span v-else class="text-muted fs-7">—</span>
                                     </td>
                                     <td class="text-end">
                                         <Link :href="route('users.edit', user.id)"

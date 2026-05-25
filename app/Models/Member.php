@@ -10,9 +10,11 @@ class Member extends Model
 {
     protected $fillable = [
         'toko_id',
+        'kode_member',
         'nama',
         'email',
         'telepon',
+        'alamat',
         'poin',
         'status',
     ];
@@ -20,8 +22,7 @@ class Member extends Model
     protected function casts(): array
     {
         return [
-            'poin'   => 'integer',
-            'status' => 'boolean',
+            'poin' => 'integer',
         ];
     }
 

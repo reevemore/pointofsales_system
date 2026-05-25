@@ -35,8 +35,8 @@ class HandleInertiaRequests extends Middleware
                 'warning'     => fn () => $request->session()->get('warning'),
                 'transaction' => fn () => $request->session()->get('transaction'),
             ],
-            'pageTitle'    => fn () => $request->session()->get('pageTitle', 'Dashboard'),
-            'pageSubtitle' => fn () => $request->session()->get('pageSubtitle', ''),
+            'pageTitle'    => fn () => $request->session()->pull('pageTitle', ''),
+            'pageSubtitle' => fn () => $request->session()->pull('pageSubtitle', ''),
         ];
     }
 }

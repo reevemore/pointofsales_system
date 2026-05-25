@@ -37,13 +37,14 @@
 </template>
 
 <script setup>
-import { ref, computed, watch } from 'vue'
+import { computed } from 'vue'
 import AppHeader  from '@/Components/Layout/AppHeader.vue'
 import AppSidebar from '@/Components/Layout/AppSidebar.vue'
 import AppFooter  from '@/Components/Layout/AppFooter.vue'
+import { useSidebar } from '@/Composables/useSidebar'
 
-// Default false (expanded) — clear localStorage lama jika perlu
-const collapsed = ref(localStorage.getItem('sidebar_collapsed') === 'true')
+// Pakai singleton composable — state tidak reset saat navigasi Inertia
+const { collapsed, toggle: toggleSidebar } = useSidebar()
 
 const isMobile = () => typeof window !== 'undefined' && window.innerWidth < 992
 
@@ -52,18 +53,9 @@ const mainMargin = computed(() => {
     return collapsed.value ? '70px' : '265px'
 })
 
-// Header left reaktif — agar toggle button tidak tertutup sidebar
 const headerLeft = computed(() => {
     if (isMobile()) return '0px'
     return collapsed.value ? '70px' : '265px'
-})
-
-const toggleSidebar = () => {
-    collapsed.value = !collapsed.value
-}
-
-watch(collapsed, (val) => {
-    localStorage.setItem('sidebar_collapsed', String(val))
 })
 </script>
 
