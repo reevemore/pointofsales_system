@@ -28,15 +28,17 @@ export function useSwal() {
 
     /**
      * Notifikasi sukses
+     * @param {boolean} autoClose - true = auto close tanpa tombol OK (default: false)
      */
-    const showSuccess = (pesan, judul = 'Berhasil!') => {
+    const showSuccess = (pesan, judul = 'Berhasil!', autoClose = false) => {
         return SwalMixin.fire({
             title: judul,
             text: pesan,
             icon: 'success',
-            confirmButtonText: 'OK',
             timer: 2500,
             timerProgressBar: true,
+            showConfirmButton: !autoClose,
+            ...(autoClose ? {} : { confirmButtonText: 'OK' }),
         })
     }
 
@@ -80,5 +82,34 @@ export function useSwal() {
         })
     }
 
-    return { confirmDelete, showSuccess, showError, showInfo, confirmStock }
+    /**
+     * Konfirmasi logout
+     */
+    const confirmLogout = async () => {
+        return SwalMixin.fire({
+            title: 'Keluar dari Aplikasi?',
+            html: `Yakin ingin keluar dari sesi ini?<br><span class="text-muted fs-7">Anda harus login kembali untuk melanjutkan.</span>`,
+            icon: 'question',
+            showCancelButton: true,
+            confirmButtonText: 'Ya, Keluar!',
+            cancelButtonText: 'Batal',
+        })
+    }
+
+    /**
+     * Notifikasi logout berhasil (auto close)
+     */
+    const showLogoutSuccess = () => {
+        return SwalMixin.fire({
+            title: 'Berhasil Keluar!',
+            text: 'Anda telah berhasil keluar dari aplikasi.',
+            icon: 'success',
+            confirmButtonText: 'OK',
+            timer: 1500,
+            timerProgressBar: true,
+            showConfirmButton: false,
+        })
+    }
+
+    return { confirmDelete, showSuccess, showError, showInfo, confirmStock, confirmLogout, showLogoutSuccess }
 }

@@ -132,53 +132,37 @@
 </template>
 
 <script setup>
-import { ref, watch } from 'vue'                       
+import { ref } from 'vue'
 import { useForm, Link, Head } from '@inertiajs/vue3'
-import Swal from 'sweetalert2'                         
+import { useSwal } from '@/Composables/useSwal'
 
 defineProps({ canResetPassword: Boolean, status: String })
 
 const form = useForm({ email: '', password: '', remember: false })
 const showPassword = ref(false)
 
+const { showSuccess, showError } = useSwal()
+
 const submit = () => {
     form.post(route('login'), {
         onFinish: () => form.reset('password'),
 
-        //  onError: dipanggil otomatis jika ada error dari server
+        onSuccess: () => {
+            showSuccess('Selamat datang kembali! Anda berhasil masuk.', 'Login Berhasil!', true)
+        },
+
         onError: (errors) => {
-            // Jika email tidak ditemukan / kredensial tidak cocok
             if (errors.email) {
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Email Tidak Ditemukan',
-                    text: 'Email yang Anda masukkan tidak terdaftar. Silakan periksa kembali.',
-                    confirmButtonColor: '#6366f1',
-                    confirmButtonText: 'Coba Lagi',
-                })
+                showError('Email yang Anda masukkan tidak terdaftar. Silakan periksa kembali.', 'Email Tidak Ditemukan')
                 return
             }
 
-            // Jika password salah 
             if (errors.password) {
-                Swal.fire({
-                    icon: 'warning',
-                    title: 'Password Salah',
-                    text: 'Password yang Anda masukkan tidak sesuai. Silakan periksa kembali.',
-                    confirmButtonColor: '#6366f1',
-                    confirmButtonText: 'Coba Lagi',
-                })
+                showError('Password yang Anda masukkan tidak sesuai. Silakan periksa kembali.', 'Password Salah')
                 return
             }
 
-            // Fallback: error umum lainnya
-            Swal.fire({
-                icon: 'error',
-                title: 'Login Gagal',
-                text: 'Terjadi kesalahan. Silakan coba beberapa saat lagi.',
-                confirmButtonColor: '#6366f1',
-                confirmButtonText: 'OK',
-            })
+            showError('Terjadi kesalahan. Silakan coba beberapa saat lagi.', 'Login Gagal')
         },
     })
 }

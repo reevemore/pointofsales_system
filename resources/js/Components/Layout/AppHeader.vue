@@ -1,6 +1,7 @@
 <script setup>
 import { computed } from 'vue'
 import { Link, router, usePage } from '@inertiajs/vue3'
+import { useSwal } from '@/Composables/useSwal'
 
 const props = defineProps({
     collapsed: Boolean,
@@ -19,8 +20,17 @@ const isAdminOrKasir = computed(() => role.value === 'admin' || role.value === '
 const pageTitle    = computed(() => page.props.pageTitle)
 const pageSubtitle = computed(() => page.props.pageSubtitle)
 
-const logout = () => {
-    router.post(route('logout'))
+const { confirmLogout, showLogoutSuccess } = useSwal()
+
+const logout = async () => {
+    const result = await confirmLogout()
+    if (!result.isConfirmed) return
+
+    router.post(route('logout'), {}, {
+        onSuccess: async () => {
+            await showLogoutSuccess()
+        },
+    })
 }
 
 const roleLabel = computed(() => {
